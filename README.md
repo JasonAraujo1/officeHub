@@ -5,6 +5,7 @@ Grava áudio, converte em texto e gera relatórios formatados. **Esta versão é
 
 ## Telas
 
+
 Home (splash), Gravar, Transcrição (Texto/Resumo), Relatório, Anexos e Player de áudio — navegáveis entre si.
 
 ## Paleta
