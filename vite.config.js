@@ -12,8 +12,8 @@ export default defineConfig({
         name: 'AudioText',
         short_name: 'AudioText',
         description: 'Grave, converta áudio em texto e gere relatórios inteligentes',
-        theme_color: '#0a2a30',
-        background_color: '#0a2a30',
+        theme_color: '#ef8f23',
+        background_color: '#f6f5fa',
         display: 'standalone',
         start_url: '/',
         icons: [
