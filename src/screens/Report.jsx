@@ -1,55 +1,103 @@
+import { useState } from "react"
 import { Back, Share, Check, Download } from "../icons.jsx"
 import WaveHeader from "../components/WaveHeader.jsx"
-import { report } from "../data.js"
 
-const tickClass = (i) => ["", "m", "l"][i % 3]
+const SPEAKER_CLS = ["", "s2", "s3", ""]
 
-export default function Report({ go }) {
+export default function Report({ go, item }) {
+  const [tab, setTab] = useState("resumo")
+  const r = item || {}
+  const summary = r.summary || {}
+  const transcript = r.transcript || []
+
   return (
     <div className="screen">
       <WaveHeader compact>
         <div className="topbar">
-          <button className="icon-btn" onClick={() => go("attachments")}><Back /></button>
+          <button className="icon-btn" onClick={() => go("reports")}><Back /></button>
           <div className="title">Relatório</div>
           <button className="icon-btn"><Share size={18} /></button>
         </div>
       </WaveHeader>
 
-      <h1 className="report-title">{report.title}</h1>
+      <h1 className="report-title">{r.title || "Relatório"}</h1>
 
       <div className="meta-row">
         <div className="meta">
           <div className="k">Duração</div>
-          <div className="v">{report.duration}</div>
+          <div className="v">{r.durationSec ? `${Math.round(r.durationSec / 60)} min` : "—"}</div>
         </div>
         <div className="meta">
-          <div className="k">Data</div>
-          <div className="v">{report.date}</div>
+          <div className="k">Interlocutores</div>
+          <div className="v">{r.speakers || transcript.length ? (r.speakers || "—") : "—"}</div>
         </div>
       </div>
 
-      <div className="section-h">Resumo</div>
-      <p className="summary-text">{report.summary}</p>
+      {r.audioUrl && (
+        <audio className="audio-player" controls preload="none" src={r.audioUrl}>
+          Seu navegador não suporta reprodução de áudio.
+        </audio>
+      )}
 
-      <div className="section-h">Tópicos Principais</div>
-      <ul className="check-list">
-        {report.topics.map((t, i) => (
-          <li key={t}>
-            <span className={`tick ${tickClass(i)}`}><Check size={13} stroke={3} /></span>
-            {t}
-          </li>
-        ))}
-      </ul>
+      <div className="tabs">
+        <button className={tab === "resumo" ? "active" : ""} onClick={() => setTab("resumo")}>Resumo</button>
+        <button className={tab === "completo" ? "active" : ""} onClick={() => setTab("completo")}>Completo</button>
+        <button className={tab === "transcricao" ? "active" : ""} onClick={() => setTab("transcricao")}>Transcrição</button>
+      </div>
 
-      <div className="section-h">Ações Sugeridas</div>
-      <ul className="check-list">
-        {report.actions.map((a, i) => (
-          <li key={a}>
-            <span className={`tick ${tickClass(i + 1)}`}><Check size={13} stroke={3} /></span>
-            {a}
-          </li>
-        ))}
-      </ul>
+      {tab === "resumo" && (
+        <div className="feed">
+          {summary.abstract && <p className="summary-text">{summary.abstract}</p>}
+
+          {summary.topics?.length > 0 && (
+            <>
+              <div className="section-h">Tópicos Principais</div>
+              <ul className="check-list">
+                {summary.topics.map((t, i) => (
+                  <li key={i}><span className="tick"><Check size={13} stroke={3} /></span>{t}</li>
+                ))}
+              </ul>
+            </>
+          )}
+
+          {summary.actions?.length > 0 && (
+            <>
+              <div className="section-h">Ações Sugeridas</div>
+              <ul className="check-list">
+                {summary.actions.map((a, i) => (
+                  <li key={i}><span className="tick m"><Check size={13} stroke={3} /></span>{a}</li>
+                ))}
+              </ul>
+            </>
+          )}
+
+          {!summary.abstract && !summary.topics?.length && (
+            <p className="rec-status-msg">Resumo indisponível.</p>
+          )}
+        </div>
+      )}
+
+      {tab === "completo" && (
+        <div className="feed">
+          {r.fullReport
+            ? <p className="summary-text" style={{ whiteSpace: "pre-wrap" }}>{r.fullReport}</p>
+            : <p className="rec-status-msg">Relatório completo indisponível.</p>}
+        </div>
+      )}
+
+      {tab === "transcricao" && (
+        <div className="feed">
+          {transcript.length > 0 ? transcript.map((s, i) => (
+            <div className="seg" key={i}>
+              {s.start != null && <div className="ts">{s.start}</div>}
+              <div className={`who ${SPEAKER_CLS[(s.speakerIndex ?? i) % 4]}`}>
+                {s.speaker || `Interlocutor ${i + 1}`}
+              </div>
+              <p>{s.text}</p>
+            </div>
+          )) : <p className="rec-status-msg">Transcrição indisponível.</p>}
+        </div>
+      )}
 
       <button className="btn-primary"><Download size={18} /> Exportar Relatório</button>
     </div>

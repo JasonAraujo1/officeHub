@@ -1,54 +1,51 @@
 import { useState } from "react"
 import Home from "./screens/Home.jsx"
-import Record from "./screens/Record.jsx"
-import Transcription from "./screens/Transcription.jsx"
+import Reports from "./screens/Reports.jsx"
 import Report from "./screens/Report.jsx"
-import Attachments from "./screens/Attachments.jsx"
-import Player from "./screens/Player.jsx"
-import { Mic, FileText, Doc } from "./icons.jsx"
+import Login from "./screens/Login.jsx"
+import { AuthProvider, useAuth } from "./auth.jsx"
+import { isConfigured } from "./firebase.js"
 
-const SCREENS = { home: Home, record: Record, transcription: Transcription, report: Report, attachments: Attachments, player: Player }
+const SCREENS = { home: Home, reports: Reports, report: Report }
 
-// Telas que exibem a barra inferior de navegação.
-const WITH_NAV = new Set(["attachments", "report", "transcription", "player"])
-
-export default function App() {
+function Shell() {
+  const { user, loading } = useAuth()
   const [screen, setScreen] = useState("home")
   const [payload, setPayload] = useState(null)
 
-  const go = (s, data = null) => {
-    setPayload(data)
-    setScreen(s)
-    window.scrollTo({ top: 0 })
+  const go = (s, data = null) => { setPayload(data); setScreen(s); window.scrollTo({ top: 0 }) }
+
+  if (!isConfigured) {
+    return (
+      <div className="app-shell"><div className="screen">
+        <div className="setup-note">
+          <h2>Configuração necessária</h2>
+          <p>Copie <code>.env.example</code> para <code>.env</code> e preencha as variáveis do Firebase e do n8n. Veja o <code>SETUP.md</code>.</p>
+        </div>
+      </div></div>
+    )
   }
 
-  const Current = SCREENS[screen]
+  if (loading) {
+    return <div className="app-shell"><div className="screen"><p className="rec-status-msg" style={{ margin: "auto" }}>Carregando…</p></div></div>
+  }
 
+  if (!user) {
+    return <div className="app-shell"><Login /></div>
+  }
+
+  const Current = SCREENS[screen] || Home
   return (
     <div className="app-shell">
       <Current go={go} item={payload} />
-
-      {WITH_NAV.has(screen) && (
-        <nav className="bottom-nav">
-          <button
-            className={screen === "attachments" ? "active" : ""}
-            onClick={() => go("attachments")}
-          >
-            <FileText size={22} /> Anexos
-          </button>
-
-          <button className="mic-tab" onClick={() => go("record")} aria-label="Gravar">
-            <Mic size={24} />
-          </button>
-
-          <button
-            className={screen === "report" ? "active" : ""}
-            onClick={() => go("report")}
-          >
-            <Doc size={22} /> Relatório
-          </button>
-        </nav>
-      )}
     </div>
+  )
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <Shell />
+    </AuthProvider>
   )
 }

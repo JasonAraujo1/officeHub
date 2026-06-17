@@ -1,7 +1,9 @@
 # AudioText
 
 Progressive Web App (PWA) de gravação e transcrição de áudio com **Vite + React**.
-Grava áudio, converte em texto e gera relatórios formatados. **Esta versão é só a interface** (dados fictícios, sem backend de transcrição ainda).
+Grava/anexa áudio, transcreve com diarização (separa interlocutores) e gera um relatório completo de audiodescrição + um resumo em tópicos.
+
+**Backend:** Firebase (Auth, Firestore, Storage) + n8n (AssemblyAI para transcrição e OpenAI GPT-4o-mini para os relatórios). Passo a passo de configuração em **[SETUP.md](./SETUP.md)**.
 
 ## Telas
 

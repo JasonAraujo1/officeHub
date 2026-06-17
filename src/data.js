@@ -21,6 +21,13 @@ export const transcript = [
   { ts: "00:02:30", who: "Locutor 2", cls: "s2", text: "Concordo. Podemos definir um orçamento para o próximo trimestre." },
 ]
 
+// Lista de relatórios de áudios já analisados.
+export const reports = [
+  { id: 1, title: "Reunião de alinhamento", date: "10 Nov 2024", duration: "06:42" },
+  { id: 2, title: "Entrevista com cliente", date: "08 Nov 2024", duration: "12:18" },
+  { id: 3, title: "Ideias do projeto", date: "07 Nov 2024", duration: "04:21" },
+]
+
 export const report = {
   title: "Resumo do Áudio",
   duration: "06:42",

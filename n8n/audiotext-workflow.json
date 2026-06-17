@@ -1,0 +1,142 @@
+{
+  "name": "AudioText - Transcrição e Relatórios",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "audiotext",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "node-webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [-40, 300],
+      "webhookId": "audiotext"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.assemblyai.com/v2/transcript",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ audio_url: $json.body.audioUrl, speaker_labels: true, language_code: 'pt' }) }}",
+        "options": {}
+      },
+      "id": "node-aai-submit",
+      "name": "AssemblyAI - Enviar",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [180, 300]
+    },
+    {
+      "parameters": {
+        "amount": 15,
+        "unit": "seconds"
+      },
+      "id": "node-wait",
+      "name": "Aguardar",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [400, 300],
+      "webhookId": "audiotext-wait"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://api.assemblyai.com/v2/transcript/{{ $('AssemblyAI - Enviar').item.json.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "node-aai-status",
+      "name": "AssemblyAI - Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [620, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "typeValidation": "loose" },
+          "combinator": "and",
+          "conditions": [
+            {
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "completed",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "node-if",
+      "name": "Concluido?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [840, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'gpt-4o-mini', response_format: { type: 'json_object' }, messages: [ { role: 'system', content: 'Voce e um analista de audio. A partir da transcricao com interlocutores, gere um JSON em portugues com os campos: fullReport (relatorio completo de audiodescricao, detalhado e em texto corrido), summary (objeto com abstract, topics que e um array de topicos otimizados, e actions que e um array de acoes sugeridas) e speakers (numero de interlocutores). Identifique e interprete os interlocutores. Responda APENAS com JSON valido.' }, { role: 'user', content: 'Transcricao: ' + JSON.stringify($('AssemblyAI - Status').item.json.utterances || $('AssemblyAI - Status').item.json.text) } ] }) }}",
+        "options": {}
+      },
+      "id": "node-openai",
+      "name": "OpenAI - Relatorios",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1060, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "const aai = $('AssemblyAI - Status').item.json;\nconst ai = JSON.parse($json.choices[0].message.content);\n\nconst utt = (aai.utterances || []).map(u => ({\n  mapValue: { fields: {\n    speaker: { stringValue: 'Interlocutor ' + (u.speaker || '?') },\n    text: { stringValue: u.text || '' },\n    start: { integerValue: String(Math.round((u.start || 0) / 1000)) }\n  } }\n}));\n\nconst sm = ai.summary || {};\nconst topics = (sm.topics || ai.topics || []).map(t => ({ stringValue: String(t) }));\nconst actions = (sm.actions || ai.actions || []).map(t => ({ stringValue: String(t) }));\nconst speakerCount = ai.speakers || new Set((aai.utterances || []).map(u => u.speaker)).size || 0;\n\nconst fields = {\n  status: { stringValue: 'done' },\n  fullReport: { stringValue: ai.fullReport || '' },\n  speakers: { integerValue: String(speakerCount) },\n  summary: { mapValue: { fields: {\n    abstract: { stringValue: sm.abstract || ai.abstract || '' },\n    topics: { arrayValue: { values: topics } },\n    actions: { arrayValue: { values: actions } }\n  } } },\n  transcript: { arrayValue: { values: utt } }\n};\n\nreturn [{ json: { fields } }];"
+      },
+      "id": "node-code",
+      "name": "Montar Firestore",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1280, 200]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://firestore.googleapis.com/v1/projects/{{ $('Webhook').item.json.body.projectId }}/databases/(default)/documents/users/{{ $('Webhook').item.json.body.uid }}/reports/{{ $('Webhook').item.json.body.reportId }}?updateMask.fieldPaths=status&updateMask.fieldPaths=fullReport&updateMask.fieldPaths=summary&updateMask.fieldPaths=transcript&updateMask.fieldPaths=speakers",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ fields: $json.fields }) }}",
+        "options": {}
+      },
+      "id": "node-firestore",
+      "name": "Firestore - Atualizar",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1500, 200]
+    }
+  ],
+  "connections": {
+    "Webhook": { "main": [[{ "node": "AssemblyAI - Enviar", "type": "main", "index": 0 }]] },
+    "AssemblyAI - Enviar": { "main": [[{ "node": "Aguardar", "type": "main", "index": 0 }]] },
+    "Aguardar": { "main": [[{ "node": "AssemblyAI - Status", "type": "main", "index": 0 }]] },
+    "AssemblyAI - Status": { "main": [[{ "node": "Concluido?", "type": "main", "index": 0 }]] },
+    "Concluido?": {
+      "main": [
+        [{ "node": "OpenAI - Relatorios", "type": "main", "index": 0 }],
+        [{ "node": "Aguardar", "type": "main", "index": 0 }]
+      ]
+    },
+    "OpenAI - Relatorios": { "main": [[{ "node": "Montar Firestore", "type": "main", "index": 0 }]] },
+    "Montar Firestore": { "main": [[{ "node": "Firestore - Atualizar", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" }
+}

@@ -3,17 +3,21 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
+  server: {
+    port: 5173,
+    strictPort: true, // sempre usa a 5173 (falha em vez de mudar de porta)
+  },
   plugins: [
     react(),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'icons/icon.svg'],
       manifest: {
-        name: 'AudioText',
-        short_name: 'AudioText',
+        name: 'controllerHub',
+        short_name: 'controllerHub',
         description: 'Grave, converta áudio em texto e gere relatórios inteligentes',
-        theme_color: '#ef8f23',
-        background_color: '#f6f5fa',
+        theme_color: '#111111',
+        background_color: '#ffffff',
         display: 'standalone',
         start_url: '/',
         icons: [
@@ -35,7 +39,8 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,png,ico}'],
       },
       devOptions: {
-        enabled: true,
+        // Desligado em dev: o service worker interfere nas requisições do Firestore.
+        enabled: false,
       },
     }),
   ],
