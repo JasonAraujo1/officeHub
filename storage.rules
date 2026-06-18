@@ -3,7 +3,12 @@ service firebase.storage {
   match /b/{bucket}/o {
     // Cada usuário só envia/lê os próprios áudios.
     match /users/{uid}/audios/{file} {
-      allow read, write: if request.auth != null && request.auth.uid == uid;
+      allow read: if request.auth != null && request.auth.uid == uid;
+      // Só áudio e no máximo ~1h30 (250 MB cobre formatos comuns nessa duração).
+      allow write: if request.auth != null
+                   && request.auth.uid == uid
+                   && request.resource.size < 250 * 1024 * 1024
+                   && request.resource.contentType.matches('audio/.*');
     }
   }
 }

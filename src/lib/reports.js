@@ -1,7 +1,7 @@
 import {
-  collection, doc, setDoc, onSnapshot, query, orderBy, serverTimestamp,
+  collection, doc, setDoc, deleteDoc, onSnapshot, query, orderBy, serverTimestamp,
 } from "firebase/firestore"
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage"
+import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage"
 import { db, storage, auth } from "../firebase.js"
 
 function uid() {
@@ -17,7 +17,10 @@ export async function createReport(blob, { title, durationSec = 0, ext = "webm" 
 
   // 1) UPLOAD primeiro — usa HTTPS comum (não o canal de streaming do Firestore),
   //    então funciona mesmo se o Firestore estiver lento. Isso dispara a Cloud Function.
-  await uploadBytes(ref(storage, path), blob, { contentType: blob.type || "audio/webm" })
+  // a regra do Storage exige audio/*; .webm às vezes vem como "video/webm",
+  // então forçamos um contentType de áudio (não afeta a transcrição)
+  const contentType = blob.type && blob.type.startsWith("audio/") ? blob.type : "audio/webm"
+  await uploadBytes(ref(storage, path), blob, { contentType })
   const audioUrl = await getDownloadURL(ref(storage, path))
 
   // 2) cria o documento — SEM travar esperando o ack do servidor.
@@ -41,4 +44,17 @@ export function subscribeReports(cb) {
   const u = uid()
   const q = query(collection(db, "users", u, "reports"), orderBy("createdAt", "desc"))
   return onSnapshot(q, (snap) => cb(snap.docs.map((d) => d.data())))
+}
+
+// Exclui o relatório (doc) e o áudio do Storage.
+export async function deleteReport(report) {
+  const u = uid()
+  await deleteDoc(doc(db, "users", u, "reports", report.id))
+  if (report.audioUrl) {
+    try {
+      await deleteObject(ref(storage, report.audioUrl))
+    } catch (e) {
+      console.warn("Áudio já removido ou inacessível:", e)
+    }
+  }
 }

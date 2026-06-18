@@ -10,6 +10,9 @@ function fmt(s) {
   return `${m}:${ss}`
 }
 
+const MAX_MIN = 90 // 1h30: limite de duração da gravação
+const MAX_BYTES = 250 * 1024 * 1024 // ~1h30 de áudio em formatos comuns
+
 export default function Home({ go }) {
   const { user, logout } = useAuth()
   const nome = user?.displayName || user?.email?.split("@")[0] || "usuário"
@@ -32,6 +35,11 @@ export default function Home({ go }) {
     }
     return () => clearInterval(timer.current)
   }, [recording])
+
+  // Para automaticamente ao atingir 1h30 de gravação
+  useEffect(() => {
+    if (recording && secs >= MAX_MIN * 60) stopRecording()
+  }, [secs, recording])
 
   async function startRecording() {
     setStatus(null)
@@ -70,7 +78,7 @@ export default function Home({ go }) {
       setStatus("Áudio enviado! O relatório aparecerá em Relatórios.")
       setTimeout(() => go("reports"), 900)
     } catch (e) {
-      setStatus("Erro ao enviar: " + (e?.message || e))
+      setStatus("Erro ao enviar o áudio. Tente novamente.")
       console.error(e)
     } finally {
       setBusy(false)
@@ -79,9 +87,21 @@ export default function Home({ go }) {
 
   async function onAttach(e) {
     const file = e.target.files?.[0]
+    e.target.value = "" // permite reanexar o mesmo arquivo depois
     if (!file) return
-    const ext = file.name.split(".").pop() || "mp3"
-    await sendAudio(file, file.name, 0, ext)
+    const ext = (file.name.split(".").pop() || "").toLowerCase()
+    const audioExts = ["mp3", "wav", "m4a", "aac", "ogg", "oga", "opus", "webm", "flac", "mp4", "mpeg", "mpga", "aiff", "wma"]
+    // alguns áudios chegam com file.type vazio — então aceitamos por extensão também
+    const isAudio = file.type.startsWith("audio/") || audioExts.includes(ext)
+    if (!isAudio) {
+      setStatus("Selecione um arquivo de áudio válido.")
+      return
+    }
+    if (file.size > MAX_BYTES) {
+      setStatus("Áudio muito grande (máximo ~1h30).")
+      return
+    }
+    await sendAudio(file, file.name, 0, ext || "mp3")
   }
 
   return (
@@ -121,7 +141,7 @@ export default function Home({ go }) {
           <span className="ic"><Plus size={20} /></span>
           Anexar áudio
         </button>
-        <input ref={fileRef} type="file" accept="audio/*" hidden onChange={onAttach} />
+        <input ref={fileRef} type="file" accept="audio/*,.mp3,.wav,.m4a,.aac,.ogg,.oga,.opus,.webm,.flac,.mp4,.mpeg,.mpga,.aiff,.wma" hidden onChange={onAttach} />
 
         <button className="action-btn primary" onClick={() => go("reports")}>
           <span className="ic"><FileText size={20} /></span>

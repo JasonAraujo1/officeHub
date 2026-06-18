@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { Back, Share, Check, Download } from "../icons.jsx"
 import WaveHeader from "../components/WaveHeader.jsx"
+import { generateReportPdf } from "../lib/pdf.js"
 
 const SPEAKER_CLS = ["", "s2", "s3", ""]
 
@@ -16,7 +17,7 @@ export default function Report({ go, item }) {
         <div className="topbar">
           <button className="icon-btn" onClick={() => go("reports")}><Back /></button>
           <div className="title">Relatório</div>
-          <button className="icon-btn"><Share size={18} /></button>
+          <button className="icon-btn" onClick={() => generateReportPdf(r)} title="Exportar PDF"><Share size={18} /></button>
         </div>
       </WaveHeader>
 
@@ -79,9 +80,49 @@ export default function Report({ go, item }) {
 
       {tab === "completo" && (
         <div className="feed">
-          {r.fullReport
-            ? <p className="summary-text" style={{ whiteSpace: "pre-wrap" }}>{r.fullReport}</p>
-            : <p className="rec-status-msg">Relatório completo indisponível.</p>}
+          {(r.analysis || r.fullReport) && (
+            <>
+              <div className="section-h">Análise do Diálogo</div>
+              <p className="summary-text" style={{ whiteSpace: "pre-wrap" }}>{r.analysis || r.fullReport}</p>
+            </>
+          )}
+
+          {r.requested?.length > 0 && (
+            <>
+              <div className="section-h">O que foi pedido</div>
+              <ul className="check-list">
+                {r.requested.map((t, i) => (
+                  <li key={i}><span className="tick"><Check size={13} stroke={3} /></span>{t}</li>
+                ))}
+              </ul>
+            </>
+          )}
+
+          {r.done?.length > 0 && (
+            <>
+              <div className="section-h">O que foi feito</div>
+              <ul className="check-list">
+                {r.done.map((t, i) => (
+                  <li key={i}><span className="tick"><Check size={13} stroke={3} /></span>{t}</li>
+                ))}
+              </ul>
+            </>
+          )}
+
+          {(r.toDo?.length > 0 || r.summary?.actions?.length > 0) && (
+            <>
+              <div className="section-h">O que se quer que seja feito</div>
+              <ul className="check-list">
+                {(r.toDo?.length ? r.toDo : r.summary.actions).map((t, i) => (
+                  <li key={i}><span className="tick m"><Check size={13} stroke={3} /></span>{t}</li>
+                ))}
+              </ul>
+            </>
+          )}
+
+          {!(r.analysis || r.fullReport) && !r.requested?.length && !r.done?.length && !r.toDo?.length && (
+            <p className="rec-status-msg">Relatório completo indisponível.</p>
+          )}
         </div>
       )}
 
@@ -99,7 +140,7 @@ export default function Report({ go, item }) {
         </div>
       )}
 
-      <button className="btn-primary"><Download size={18} /> Exportar Relatório</button>
+      <button className="btn-primary" onClick={() => generateReportPdf(r)}><Download size={18} /> Exportar PDF</button>
     </div>
   )
 }

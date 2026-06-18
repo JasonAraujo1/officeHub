@@ -85,27 +85,64 @@ exports.processAudio = onObjectFinalized(
       const speakerCount = new Set((t.utterances || []).map((u) => u.speaker)).size
 
       // 5) gera os relatórios com Groq (Llama 3.3 — camada gratuita, API compatível com OpenAI)
+      // Monta uma transcrição COMPACTA ("Interlocutor: fala"). Mandar o JSON bruto
+      // das utterances (com o array de palavras de cada fala) estoura o limite de
+      // tokens do Groq em áudios longos — era a causa do "erro ao processar".
+      let transcriptText = utterances.length
+        ? utterances.map((u) => `${u.speaker}: ${u.text}`).join("\n")
+        : (t.text || "")
+      // rede de segurança: corta transcrições muito longas (~48k chars ≈ limite seguro)
+      const MAX_CHARS = 48000
+      if (transcriptText.length > MAX_CHARS) {
+        transcriptText = transcriptText.slice(0, MAX_CHARS) + "\n[transcrição truncada por tamanho]"
+      }
+
       const messages = [
         {
           role: "system",
           content:
-            "Você é um analista de áudio. A partir da transcrição com interlocutores, gere um JSON em português com os campos: fullReport (relatório completo de audiodescrição, detalhado e em texto corrido), summary (objeto com abstract, topics que é um array de tópicos otimizados, e actions que é um array de ações sugeridas) e speakers (número de interlocutores). Identifique e interprete os interlocutores. Responda APENAS com JSON válido.",
+            "Você é um analista de reuniões e conversas. A partir da transcrição com interlocutores, gere um JSON em português com EXATAMENTE estes campos: " +
+            "summary (objeto com abstract = resumo curto em 2 a 4 frases, topics = array de tópicos principais, actions = array de ações sugeridas); " +
+            "analysis = análise do diálogo em texto corrido bem escrito (quem são os interlocutores, o tom e a dinâmica da conversa, os principais pontos discutidos e as conclusões); " +
+            "requested = array com o que foi pedido/solicitado durante a conversa; " +
+            "done = array com o que já foi feito, realizado ou decidido; " +
+            "toDo = array com o que se quer que seja feito (próximos passos e pendências); " +
+            "speakers = número de interlocutores. " +
+            "Use frases claras e objetivas nos arrays. Se algo não aparecer na conversa, devolva array vazio. Responda APENAS com JSON válido.",
         },
-        { role: "user", content: "Transcrição: " + JSON.stringify(t.utterances || t.text) },
+        { role: "user", content: "Transcrição:\n" + transcriptText },
       ]
-      const gq = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: { authorization: "Bearer " + groqKey, "content-type": "application/json" },
-        body: JSON.stringify({
-          model: "llama-3.3-70b-versatile",
-          response_format: { type: "json_object" },
-          temperature: 0.4,
-          messages,
-        }),
-      })
-      if (!gq.ok) throw new Error("Groq falhou: " + (await gq.text()))
+
+      // chama o Groq com 1 tentativa extra para erro transitório (ex.: rate limit 429)
+      const callGroq = () =>
+        fetch("https://api.groq.com/openai/v1/chat/completions", {
+          method: "POST",
+          headers: { authorization: "Bearer " + groqKey, "content-type": "application/json" },
+          body: JSON.stringify({
+            model: "llama-3.3-70b-versatile",
+            response_format: { type: "json_object" },
+            temperature: 0.4,
+            messages,
+          }),
+        })
+      let gq = await callGroq()
+      if (!gq.ok) {
+        const errText = await gq.text()
+        logger.warn("Groq 1ª tentativa falhou:", gq.status, errText)
+        await sleep(8000)
+        gq = await callGroq()
+        if (!gq.ok) throw new Error("Groq falhou: " + gq.status + " " + (await gq.text()))
+      }
       const gqJson = await gq.json()
-      const ai = JSON.parse(gqJson.choices[0].message.content)
+      const raw = gqJson?.choices?.[0]?.message?.content || "{}"
+      let ai
+      try {
+        ai = JSON.parse(raw)
+      } catch (parseErr) {
+        logger.warn("Groq retornou JSON inválido, tentando extrair:", raw.slice(0, 500))
+        const match = raw.match(/\{[\s\S]*\}/)
+        ai = match ? JSON.parse(match[0]) : {}
+      }
       const sm = ai.summary || {}
       await setProgress(95, "Finalizando")
 
@@ -115,7 +152,11 @@ exports.processAudio = onObjectFinalized(
           status: "done",
           progress: 100,
           stage: "Concluído",
-          fullReport: ai.fullReport || "",
+          analysis: ai.analysis || ai.fullReport || "",
+          fullReport: ai.analysis || ai.fullReport || "", // compat com versões antigas
+          requested: ai.requested || [],
+          done: ai.done || [],
+          toDo: ai.toDo || ai.todo || [],
           summary: {
             abstract: sm.abstract || ai.abstract || "",
             topics: sm.topics || ai.topics || [],
@@ -130,8 +171,12 @@ exports.processAudio = onObjectFinalized(
 
       logger.info("Relatório pronto:", reportId)
     } catch (e) {
+      // Detalhe técnico só no log; mensagem genérica no documento do usuário.
       logger.error("Falha ao processar", reportId, e)
-      await docRef.set({ status: "error", error: String(e.message || e) }, { merge: true })
+      await docRef.set(
+        { status: "error", error: "Não foi possível gerar o relatório." },
+        { merge: true }
+      )
     }
   }
 )
