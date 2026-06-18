@@ -15,24 +15,23 @@ export async function createReport(blob, { title, durationSec = 0, ext = "webm" 
   const id = (crypto.randomUUID?.() || String(Date.now()))
   const path = `users/${u}/audios/${id}.${ext}`
 
-  // 1) cria o documento do relatório (status inicial)
-  await setDoc(doc(db, "users", u, "reports", id), {
+  // 1) UPLOAD primeiro — usa HTTPS comum (não o canal de streaming do Firestore),
+  //    então funciona mesmo se o Firestore estiver lento. Isso dispara a Cloud Function.
+  await uploadBytes(ref(storage, path), blob, { contentType: blob.type || "audio/webm" })
+  const audioUrl = await getDownloadURL(ref(storage, path))
+
+  // 2) cria o documento — SEM travar esperando o ack do servidor.
+  //    A escrita vai pro cache local na hora e sincroniza em background.
+  setDoc(doc(db, "users", u, "reports", id), {
     id,
     title: title || "Gravação",
     status: "processing",
     progress: 5,
     stage: "Enviando áudio",
     durationSec,
+    audioUrl,
     createdAt: serverTimestamp(),
-  })
-
-  // 2) upload do áudio — isso dispara a Cloud Function que processa e
-  //    atualiza o documento com a transcrição e os relatórios.
-  await uploadBytes(ref(storage, path), blob, { contentType: blob.type || "audio/webm" })
-  const audioUrl = await getDownloadURL(ref(storage, path))
-
-  // 3) salva a URL do áudio no documento (para reprodução)
-  await setDoc(doc(db, "users", u, "reports", id), { audioUrl }, { merge: true })
+  }).catch((e) => console.error("Falha ao criar o doc do relatório:", e))
 
   return id
 }
