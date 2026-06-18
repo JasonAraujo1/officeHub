@@ -8,7 +8,7 @@ const logger = require("firebase-functions/logger")
 initializeApp()
 
 const ASSEMBLYAI_API_KEY = defineSecret("ASSEMBLYAI_API_KEY")
-const OPENAI_API_KEY = defineSecret("OPENAI_API_KEY")
+const GROQ_API_KEY = defineSecret("GROQ_API_KEY")
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 
@@ -16,7 +16,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 exports.processAudio = onObjectFinalized(
   {
     region: "us-east1",
-    secrets: [ASSEMBLYAI_API_KEY, OPENAI_API_KEY],
+    secrets: [ASSEMBLYAI_API_KEY, GROQ_API_KEY],
     timeoutSeconds: 540,
     memory: "512MiB",
   },
@@ -36,7 +36,7 @@ exports.processAudio = onObjectFinalized(
 
     try {
       const aaiKey = ASSEMBLYAI_API_KEY.value()
-      const openaiKey = OPENAI_API_KEY.value()
+      const groqKey = GROQ_API_KEY.value()
 
       // 1) baixa o áudio do Storage
       await setProgress(10, "Enviando áudio")
@@ -84,7 +84,7 @@ exports.processAudio = onObjectFinalized(
       }))
       const speakerCount = new Set((t.utterances || []).map((u) => u.speaker)).size
 
-      // 5) gera os relatórios com GPT-4o-mini
+      // 5) gera os relatórios com Groq (Llama 3.3 — camada gratuita, API compatível com OpenAI)
       const messages = [
         {
           role: "system",
@@ -93,18 +93,19 @@ exports.processAudio = onObjectFinalized(
         },
         { role: "user", content: "Transcrição: " + JSON.stringify(t.utterances || t.text) },
       ]
-      const oa = await fetch("https://api.openai.com/v1/chat/completions", {
+      const gq = await fetch("https://api.groq.com/openai/v1/chat/completions", {
         method: "POST",
-        headers: { authorization: "Bearer " + openaiKey, "content-type": "application/json" },
+        headers: { authorization: "Bearer " + groqKey, "content-type": "application/json" },
         body: JSON.stringify({
-          model: "gpt-4o-mini",
+          model: "llama-3.3-70b-versatile",
           response_format: { type: "json_object" },
+          temperature: 0.4,
           messages,
         }),
       })
-      if (!oa.ok) throw new Error("OpenAI falhou: " + (await oa.text()))
-      const oaJson = await oa.json()
-      const ai = JSON.parse(oaJson.choices[0].message.content)
+      if (!gq.ok) throw new Error("Groq falhou: " + (await gq.text()))
+      const gqJson = await gq.json()
+      const ai = JSON.parse(gqJson.choices[0].message.content)
       const sm = ai.summary || {}
       await setProgress(95, "Finalizando")
 
