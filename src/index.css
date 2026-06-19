@@ -866,3 +866,17 @@ html, body { background: #000; }
   padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px));
 }
 :root { --nav-h: 92px; }
+
+/* ===================================================================
+   CALENDÁRIO — navegação de meses + formulário de tarefa
+=================================================================== */
+.cal-nav { display: flex; align-items: center; justify-content: center; gap: 16px; margin: 14px 0 4px; }
+.cal-nav button { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--surface-2); color: var(--ink); }
+.cal-nav-label { font-size: 15px; font-weight: 700; color: var(--ink); min-width: 150px; text-align: center; }
+.type-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.type-chip { display: inline-flex; align-items: center; gap: 7px; padding: 9px 13px; border-radius: 999px; background: var(--surface-2); font-size: 13px; font-weight: 600; color: var(--ink); }
+.type-chip.active { outline: 2px solid var(--dark); }
+.pill.ghost { background: var(--surface-2); color: var(--ink); }
+
+/* botão excluir evento no modal */
+.ev-del { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--surface-2); color: var(--ink-2); flex: 0 0 auto; }
