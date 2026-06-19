@@ -858,3 +858,11 @@ html, body { background: #000; }
 /* meta cards do relatório: textos pretos */
 .report-screen .meta .k { color: #000; }
 .report-screen .meta .v { color: #000; }
+
+/* nav inferior: padding fixo para os ícones não encostarem na borda (incl. área segura) */
+.bottom-nav {
+  height: auto;
+  padding-top: 14px;
+  padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+}
+:root { --nav-h: 92px; }
