@@ -1,6 +1,5 @@
 import { useState } from "react"
 import { Back, Share, Check, Download } from "../icons.jsx"
-import WaveHeader from "../components/WaveHeader.jsx"
 import AudioPlayer from "../components/AudioPlayer.jsx"
 import { generateReportPdf, generateTranscriptPdf } from "../lib/pdf.js"
 
@@ -14,13 +13,11 @@ export default function Report({ go, item }) {
 
   return (
     <div className="screen">
-      <WaveHeader compact>
-        <div className="topbar">
-          <button className="icon-btn" onClick={() => go("reports")}><Back /></button>
-          <div className="title">Relatório</div>
-          <button className="icon-btn" onClick={() => generateReportPdf(r)} title="Exportar PDF"><Share size={18} /></button>
-        </div>
-      </WaveHeader>
+      <div className="topbar">
+        <button className="round-btn" onClick={() => go("reports")} aria-label="Voltar"><Back size={20} /></button>
+        <div className="title center">Relatório</div>
+        <button className="round-btn" onClick={() => generateReportPdf(r)} title="Exportar PDF" aria-label="Exportar PDF"><Share size={18} /></button>
+      </div>
 
       <h1 className="report-title">{r.title || "Relatório"}</h1>
 

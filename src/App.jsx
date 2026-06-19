@@ -2,11 +2,17 @@ import { useState } from "react"
 import Home from "./screens/Home.jsx"
 import Reports from "./screens/Reports.jsx"
 import Report from "./screens/Report.jsx"
+import Calendar from "./screens/Calendar.jsx"
+import Widgets from "./screens/Widgets.jsx"
+import Record from "./screens/Record.jsx"
+import Attach from "./screens/Attach.jsx"
 import Login from "./screens/Login.jsx"
+import BottomNav from "./components/BottomNav.jsx"
 import { AuthProvider, useAuth } from "./auth.jsx"
 import { isConfigured } from "./firebase.js"
 
-const SCREENS = { home: Home, reports: Reports, report: Report }
+const SCREENS = { home: Home, reports: Reports, report: Report, calendar: Calendar, widgets: Widgets, record: Record, attach: Attach }
+const NAV_TABS = ["home", "reports", "calendar", "widgets"]
 
 function Shell() {
   const { user, loading } = useAuth()
@@ -35,9 +41,11 @@ function Shell() {
   }
 
   const Current = SCREENS[screen] || Home
+  const showNav = NAV_TABS.includes(screen)
   return (
     <div className="app-shell">
       <Current go={go} item={payload} />
+      {showNav && <BottomNav active={screen} go={go} />}
     </div>
   )
 }

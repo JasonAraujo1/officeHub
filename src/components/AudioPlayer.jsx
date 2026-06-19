@@ -2,12 +2,12 @@ import { useEffect, useMemo, useRef, useState } from "react"
 
 // Player de áudio no estilo Google Recorder: waveform clicável (tan/azul),
 // tempos e barra de controles CIRCULARES (voltar 5s · play/pause salmão · avançar 10s).
-const CENTER_BG = "#f3b0a6"   // botão central (salmão claro)
-const CENTER_IC = "#1f1b1a"
-const SIDE_BG = "#36302d"     // botões laterais (cinza escuro)
-const SIDE_IC = "#cfc9c4"
-const WAVE_PLAYED = "#c9a98a" // tan (parte tocada)
-const WAVE_REST = "#6c8fc7"   // azul (restante)
+const CENTER_BG = "#181a20"   // botão central (escuro)
+const CENTER_IC = "#ffffff"
+const SIDE_BG = "#f6f6f8"     // botões laterais (claro)
+const SIDE_IC = "#16171d"
+const WAVE_PLAYED = "#181a20" // parte tocada (escuro)
+const WAVE_REST = "#e4e2ea"   // restante (cinza claro)
 
 function fmt(s) {
   if (!isFinite(s) || s < 0) return "0:00"

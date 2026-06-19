@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
 import { Back, FileText, Chevron } from "../icons.jsx"
-import WaveHeader from "../components/WaveHeader.jsx"
 import { subscribeReports, deleteReport } from "../lib/reports.js"
 
 // Converte o createdAt (Timestamp do Firestore, Date ou {seconds}) em Date
@@ -130,20 +129,18 @@ export default function Reports({ go }) {
   )
 
   return (
-    <div className="screen">
-      <WaveHeader compact>
-        <div className="topbar">
-          <button className="icon-btn ghost" onClick={() => go("home")}><Back /></button>
-          <div className="title">Relatórios</div>
-          <span style={{ width: 40 }} />
-        </div>
-      </WaveHeader>
+    <div className="screen has-nav">
+      <div className="topbar">
+        <button className="round-btn" onClick={() => go("home")} aria-label="Voltar"><Back size={20} /></button>
+        <div className="title center">Relatórios</div>
+        <span style={{ width: 44 }} />
+      </div>
 
       {loading ? (
         <p className="rec-status-msg" style={{ margin: "20px auto" }}>Carregando…</p>
       ) : reports.length === 0 ? (
         <div className="empty">
-          <FileText size={40} />
+          <span className="empty-ic"><FileText size={36} /></span>
           <p>Nenhum relatório ainda.</p>
           <span>Grave ou anexe um áudio para gerar um relatório.</span>
         </div>

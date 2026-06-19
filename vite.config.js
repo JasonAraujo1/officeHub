@@ -6,6 +6,12 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: true, // sempre usa a 5173 (falha em vez de mudar de porta)
+    watch: {
+      // Pasta montada (Windows via WSL) não dispara eventos de FS:
+      // o polling faz o Vite checar mudanças periodicamente e reativa o hot-reload.
+      usePolling: true,
+      interval: 300,
+    },
   },
   plugins: [
     react(),
