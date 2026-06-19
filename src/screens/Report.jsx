@@ -1,7 +1,8 @@
 import { useState } from "react"
 import { Back, Share, Check, Download } from "../icons.jsx"
 import WaveHeader from "../components/WaveHeader.jsx"
-import { generateReportPdf } from "../lib/pdf.js"
+import AudioPlayer from "../components/AudioPlayer.jsx"
+import { generateReportPdf, generateTranscriptPdf } from "../lib/pdf.js"
 
 const SPEAKER_CLS = ["", "s2", "s3", ""]
 
@@ -34,11 +35,7 @@ export default function Report({ go, item }) {
         </div>
       </div>
 
-      {r.audioUrl && (
-        <audio className="audio-player" controls preload="none" src={r.audioUrl}>
-          Seu navegador não suporta reprodução de áudio.
-        </audio>
-      )}
+      {r.audioUrl && <AudioPlayer src={r.audioUrl} />}
 
       <div className="tabs">
         <button className={tab === "resumo" ? "active" : ""} onClick={() => setTab("resumo")}>Resumo</button>
@@ -141,6 +138,7 @@ export default function Report({ go, item }) {
       )}
 
       <button className="btn-primary" onClick={() => generateReportPdf(r)}><Download size={18} /> Exportar PDF</button>
+      <button className="btn-primary" style={{ background: "var(--card-2)", color: "var(--ink)", border: "none", marginTop: 12 }} onClick={() => generateTranscriptPdf(r)}><Download size={18} /> Baixar Descrição Completa</button>
     </div>
   )
 }

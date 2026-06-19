@@ -1,43 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
 :root {
-  /* ---------- Base / superfícies (preto e branco) ---------- */
-  --bg: #ffffff;
-  --card: #ffffff;
-  --card-2: #f4f4f4;
-  --line: #e2e2e2;
-  --line-strong: #cccccc;
+  /* ---------- Base / superfícies (escuro, estilo Google Recorder) ---------- */
+  --bg: #1f1b1a;
+  --card: #2a2522;
+  --card-2: #332e2a;
+  --line: #3a3430;
+  --line-strong: #4a443e;
 
   /* ---------- Texto ---------- */
-  --ink: #111111;
-  --ink-soft: #555555;
-  --ink-faint: #999999;
-  --on-accent: #ffffff;
+  --ink: #ececec;
+  --ink-soft: #b8b2ab;
+  --ink-faint: #8a847d;
+  --on-accent: #1f1b1a;
 
-  /* ---------- "Acento" neutro (preto) ---------- */
-  --accent: #111111;
-  --accent-2: #333333;
-  --accent-deep: #000000;
-  --accent-soft: #f0f0f0;
-  --accent-tint: #f7f7f7;
-  --accent-ink: #111111;
-  --grad: #111111;
+  /* ---------- "Acento" (salmão claro) ---------- */
+  --accent: #f3b0a6;
+  --accent-2: #f6c0b8;
+  --accent-deep: #f3b0a6;
+  --accent-soft: #3a302e;
+  --accent-tint: #2a2422;
+  --accent-ink: #f3b0a6;
+  --grad: #f3b0a6;          /* botões primários salmão */
 
-  /* ---------- Tintas (cinza neutro) ---------- */
-  --tile-amber: #f0f0f0;   --tile-amber-ic: #333333;
-  --tile-blue: #f0f0f0;    --tile-blue-ic: #333333;
-  --tile-green: #f0f0f0;   --tile-green-ic: #333333;
-  --tile-rose: #f0f0f0;    --tile-rose-ic: #333333;
+  /* ---------- Tintas (cinza escuro + acentos do Recorder) ---------- */
+  --tile-amber: #332e2a;   --tile-amber-ic: #f3b0a6;
+  --tile-blue: #332e2a;    --tile-blue-ic: #6c8fc7;
+  --tile-green: #332e2a;   --tile-green-ic: #c9a98a;
+  --tile-rose: #332e2a;    --tile-rose-ic: #f3b0a6;
 
   /* ---------- Forma ---------- */
-  --r-sm: 12px;
-  --r-md: 16px;
-  --r-lg: 20px;
-  --r-xl: 26px;
+  --r-sm: 16px;
+  --r-md: 22px;
+  --r-lg: 26px;
+  --r-xl: 32px;
 
   /* ---------- Respiros (escalam por breakpoint) ---------- */
   --pad-x: 20px;
   --pad-y: 24px;
 
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+  font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
 }
@@ -46,6 +48,7 @@
 
 body {
   min-height: 100vh;
+  min-height: 100dvh;
   background: var(--bg);
   display: flex;
   justify-content: center;
@@ -63,8 +66,9 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 =================================================================== */
 .app-shell {
   width: 100%;
-  max-width: 430px;
+  max-width: 480px;
   min-height: 100vh;
+  min-height: 100dvh;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -113,7 +117,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .icon-btn {
   width: 40px; height: 40px; border-radius: 12px;
   display: grid; place-items: center; color: var(--ink);
-  background: var(--card); border: 1px solid var(--line);
+  background: transparent; border: none;
 }
 .icon-btn.ghost { background: transparent; border: none; }
 
@@ -124,24 +128,14 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 /* ===================================================================
    WAVE HEADER (fundo de ondas)
 =================================================================== */
-.wave-header {
-  position: relative;
-  margin: calc(-1 * var(--pad-y)) calc(-1 * var(--pad-x)) 22px;
-  padding: 30px var(--pad-x) 34px;
-  border-bottom-left-radius: 30px;
-  border-bottom-right-radius: 30px;
-  overflow: hidden;
-  color: #fff;
-}
-.wave-header.compact { padding: 22px var(--pad-x) 26px; margin-bottom: 18px; }
-.wave-bg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.wave-header { position: relative; margin: 0 0 18px; padding: 4px 0 0; color: var(--ink); }
+.wave-header.compact { padding: 0; margin-bottom: 14px; }
+.wave-bg { display: none; }
 .wave-content { position: relative; z-index: 1; }
-
-/* Topbar quando está dentro do header de ondas */
 .wave-header .topbar { margin-bottom: 0; }
-.wave-header .topbar .title { color: #fff; }
-.wave-header .icon-btn.ghost { color: #fff; }
-.wave-header .icon-btn { background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.28); color: #fff; }
+.wave-header .topbar .title { color: var(--ink); }
+.wave-header .icon-btn,
+.wave-header .icon-btn.ghost { background: transparent; border: none; color: var(--ink); }
 
 /* ===================================================================
    HOME MINIMALISTA (gravar / anexar / relatórios)
@@ -168,9 +162,9 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   opacity: 0.7;
 }
 .big-record:active { transform: scale(0.96); }
-.big-record.recording { background: #000000; }
+.big-record.recording { background: #e8554a; }
 .big-record.recording::after {
-  border-color: #000000;
+  border-color: #e8554a;
   animation: pulse 1.4s ease-out infinite;
 }
 @keyframes pulse {
@@ -204,9 +198,9 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .home-actions { display: flex; flex-direction: column; gap: 12px; }
 .action-btn {
   width: 100%; padding: 16px; border-radius: 16px;
-  background: var(--card); border: 1px solid var(--line);
+  background: var(--card-2); border: none;
   display: flex; align-items: center; justify-content: center; gap: 10px;
-  font-size: 15px; font-weight: 700; color: var(--ink);
+  font-size: 15px; font-weight: 600; color: var(--ink);
 }
 .action-btn .ic { color: var(--accent-deep); display: grid; place-items: center; }
 .action-btn.primary { background: var(--grad); color: var(--on-accent); border: none; }
@@ -268,7 +262,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 /* ---------- Recentes ---------- */
 .recent-list { display: flex; flex-direction: column; gap: 12px; }
 .recent-card {
-  background: var(--card); border: 1px solid var(--line);
+  background: var(--card); border: none;
   border-radius: var(--r-lg); padding: 14px;
   display: flex; align-items: center; gap: 14px;
 }
@@ -433,3 +427,33 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 
 .sub-muted { color: var(--ink-faint); font-size: 13px; }
 .back-row { display: flex; align-items: center; gap: 4px; }
+
+/* ===================================================================
+   FASE 1 — pause, filtro de relatórios, grupos por mês
+=================================================================== */
+/* Botão de pausa/retomar durante a gravação */
+.pause-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 20px; border-radius: 24px;
+  background: var(--card-2); border: none;
+  color: var(--ink); font-size: 14px; font-weight: 600;
+}
+.pause-btn svg { display: block; }
+
+/* Filtro de período dos relatórios */
+.rpt-filter { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.rpt-filter button {
+  padding: 7px 14px; border-radius: 20px; border: none;
+  background: var(--card-2); font-size: 13px; font-weight: 500; color: var(--ink-soft);
+}
+.rpt-filter button.active { background: var(--accent-deep); color: #fff; border-color: var(--accent-deep); }
+
+/* Cabeçalho de cada grupo (mês) na lista de relatórios */
+.rpt-group-h {
+  font-size: 16px; font-weight: 500; letter-spacing: 0;
+  text-transform: capitalize; color: var(--ink); margin: 24px 0 12px;
+}
+.rpt-group-h:first-child { margin-top: 0; }
+
+/* Realce do botão de excluir no card */
+.del-btn:hover { background: #fdecea; border-radius: 10px; }

@@ -179,3 +179,130 @@ export function generateReportPdf(report = {}) {
   const safe = (r.title || "relatorio").replace(/[^\w\-]+/g, "_").slice(0, 60)
   doc.save(`${safe}.pdf`)
 }
+
+// mm:ss a partir de segundos
+function fmtTime(s) {
+  if (s == null) return ""
+  const m = Math.floor(s / 60)
+  const ss = String(s % 60).padStart(2, "0")
+  return `${m}:${ss}`
+}
+
+// Desenha header + footer estilizados em todas as páginas.
+function drawChrome(doc, { pageW, pageH, margin, headerH, footerH, subtitle }) {
+  const today = new Date().toLocaleDateString("pt-BR")
+  const total = doc.getNumberOfPages()
+  for (let p = 1; p <= total; p++) {
+    doc.setPage(p)
+    doc.setFillColor(...DARK)
+    doc.rect(0, 0, pageW, headerH, "F")
+    doc.setFillColor(...AMBER)
+    doc.rect(0, headerH, pageW, 3, "F")
+    doc.setFont("helvetica", "bold")
+    doc.setFontSize(15)
+    doc.setTextColor(255, 255, 255)
+    doc.text("controllerHub", margin, 38)
+    doc.setFont("helvetica", "normal")
+    doc.setFontSize(9.5)
+    doc.setTextColor(...AMBER)
+    doc.text(subtitle, margin, 54)
+    doc.setTextColor(190, 190, 190)
+    doc.setFontSize(9)
+    doc.text(today, pageW - margin, 38, { align: "right" })
+
+    doc.setDrawColor(...AMBER)
+    doc.setLineWidth(0.8)
+    doc.line(margin, pageH - footerH, pageW - margin, pageH - footerH)
+    doc.setFont("helvetica", "normal")
+    doc.setFontSize(8.5)
+    doc.setTextColor(...GRAY)
+    doc.text("controllerHub · Relatório gerado por IA", margin, pageH - footerH + 16)
+    doc.text(`Página ${p} de ${total}`, pageW - margin, pageH - footerH + 16, { align: "right" })
+  }
+}
+
+// Gera e baixa um PDF da DESCRIÇÃO COMPLETA (transcrição com interlocutores),
+// formatada, com o mesmo header/footer do relatório de análise.
+export function generateTranscriptPdf(report = {}) {
+  const r = report
+  const transcript = r.transcript || []
+
+  const doc = new jsPDF({ unit: "pt", format: "a4" })
+  const pageW = doc.internal.pageSize.getWidth()
+  const pageH = doc.internal.pageSize.getHeight()
+  const margin = 48
+  const maxW = pageW - margin * 2
+  const headerH = 72
+  const footerH = 40
+  const contentTop = headerH + 28
+  const contentBottom = pageH - footerH - 12
+  let y = contentTop
+
+  const ensure = (h) => {
+    if (y + h > contentBottom) {
+      doc.addPage()
+      y = contentTop
+    }
+  }
+
+  // Título + meta
+  doc.setFont("helvetica", "bold")
+  doc.setFontSize(17)
+  doc.setTextColor(...DARK)
+  doc.splitTextToSize(r.title || "Descrição Completa", maxW).forEach((l) => {
+    ensure(22)
+    doc.text(l, margin, y)
+    y += 22
+  })
+  doc.setFont("helvetica", "normal")
+  doc.setFontSize(9.5)
+  doc.setTextColor(...GRAY)
+  const dur = r.durationSec ? `${Math.round(r.durationSec / 60)} min` : "—"
+  const spk = r.speakers || "—"
+  ensure(16)
+  doc.text(`Duração: ${dur}     •     Interlocutores: ${spk}`, margin, y)
+  y += 26
+
+  if (!transcript.length) {
+    doc.setFont("helvetica", "italic")
+    doc.setFontSize(10.5)
+    doc.setTextColor(...GRAY)
+    ensure(18)
+    doc.text("Transcrição indisponível.", margin, y)
+  } else {
+    transcript.forEach((s) => {
+      const who = s.speaker || "Interlocutor"
+      const time = fmtTime(s.start)
+      // linha do interlocutor (âmbar) + tempo
+      ensure(18)
+      doc.setFont("helvetica", "bold")
+      doc.setFontSize(10.5)
+      doc.setTextColor(...AMBER)
+      doc.text(who, margin, y)
+      if (time) {
+        doc.setFont("helvetica", "normal")
+        doc.setFontSize(9)
+        doc.setTextColor(...GRAY)
+        doc.text(time, pageW - margin, y, { align: "right" })
+      }
+      y += 15
+      // fala
+      doc.setFont("helvetica", "normal")
+      doc.setFontSize(10.5)
+      doc.setTextColor(...TEXT)
+      const lines = doc.splitTextToSize(String(s.text || ""), maxW)
+      const lineH = 10.5 * 1.45
+      for (const line of lines) {
+        ensure(lineH)
+        doc.text(line, margin, y)
+        y += lineH
+      }
+      y += 10
+    })
+  }
+
+  drawChrome(doc, { pageW, pageH, margin, headerH, footerH, subtitle: "DESCRIÇÃO COMPLETA" })
+
+  const safe = (r.title || "descricao").replace(/[^\w\-]+/g, "_").slice(0, 60)
+  doc.save(`${safe}_descricao.pdf`)
+}

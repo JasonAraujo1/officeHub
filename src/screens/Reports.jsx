@@ -1,17 +1,42 @@
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Back, FileText, Chevron } from "../icons.jsx"
 import WaveHeader from "../components/WaveHeader.jsx"
 import { subscribeReports, deleteReport } from "../lib/reports.js"
 
-const STATUS_LABEL = {
-  processing: "Processando…",
-  done: "Pronto",
-  error: "Erro",
+// Converte o createdAt (Timestamp do Firestore, Date ou {seconds}) em Date
+function toDate(v) {
+  if (!v) return null
+  if (typeof v.toDate === "function") return v.toDate()
+  if (typeof v.seconds === "number") return new Date(v.seconds * 1000)
+  const d = new Date(v)
+  return isNaN(d) ? null : d
+}
+
+const PERIODS = [
+  { key: "all", label: "Tudo" },
+  { key: "day", label: "Hoje" },
+  { key: "week", label: "Semana" },
+  { key: "month", label: "Mês" },
+  { key: "year", label: "Ano" },
+]
+
+function withinPeriod(date, period) {
+  if (period === "all") return true
+  if (!date) return false
+  const now = new Date()
+  const diff = now - date
+  const DAY = 86400000
+  if (period === "day") return date.toDateString() === now.toDateString()
+  if (period === "week") return diff <= 7 * DAY
+  if (period === "month") return date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth()
+  if (period === "year") return date.getFullYear() === now.getFullYear()
+  return true
 }
 
 export default function Reports({ go }) {
   const [reports, setReports] = useState([])
   const [loading, setLoading] = useState(true)
+  const [period, setPeriod] = useState("all")
 
   async function handleDelete(e, r) {
     e.stopPropagation()
@@ -35,6 +60,75 @@ export default function Reports({ go }) {
     return () => unsub && unsub()
   }, [])
 
+  // Filtra por período e agrupa por mês (mais recente primeiro)
+  const groups = useMemo(() => {
+    const filtered = reports.filter((r) => withinPeriod(toDate(r.createdAt), period))
+    const map = new Map()
+    for (const r of filtered) {
+      const d = toDate(r.createdAt)
+      const key = d ? `${d.getFullYear()}-${String(d.getMonth()).padStart(2, "0")}` : "sem-data"
+      const label = d
+        ? d.toLocaleDateString("pt-BR", { month: "long", year: "numeric" })
+        : "Sem data"
+      if (!map.has(key)) map.set(key, { key, label, items: [] })
+      map.get(key).items.push(r)
+    }
+    return [...map.values()].sort((a, b) => (a.key < b.key ? 1 : -1))
+  }, [reports, period])
+
+  const renderCard = (r) => (
+    <button
+      key={r.id}
+      className="recent-card"
+      onClick={() => r.status === "done" && go("report", r)}
+    >
+      <span className="recent-icon"><FileText size={20} /></span>
+      <span className="recent-info">
+        <span className="r-title" style={{ display: "block" }}>{r.title}</span>
+
+        {r.status === "done" ? (
+          <span className="r-meta" style={{ display: "block" }}>
+            Pronto{r.durationSec ? ` · ${Math.round(r.durationSec / 60)} min` : ""}
+          </span>
+        ) : r.status === "error" ? (
+          <span className="r-meta" style={{ display: "block", color: "#c0392b" }}>
+            Erro ao processar
+          </span>
+        ) : (
+          <>
+            <span className="r-meta" style={{ display: "block" }}>
+              {r.stage || "Processando…"}
+            </span>
+            <span className="proc-bar">
+              <i style={{ width: `${r.progress || 5}%` }} />
+            </span>
+          </>
+        )}
+      </span>
+
+      {r.status === "done" ? (
+        <span className="chev"><Chevron size={18} /></span>
+      ) : r.status === "error" ? null : (
+        <span className="proc-pct">{r.progress || 0}%</span>
+      )}
+
+      <span
+        className="del-btn"
+        role="button"
+        tabIndex={0}
+        title="Excluir"
+        aria-label="Excluir relatório"
+        onClick={(e) => handleDelete(e, r)}
+        style={{ marginLeft: 8, padding: 6, color: "#c0392b", display: "inline-flex", cursor: "pointer", flex: "0 0 auto" }}
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M3 6h18" /><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+        </svg>
+      </span>
+    </button>
+  )
+
   return (
     <div className="screen">
       <WaveHeader compact>
@@ -54,60 +148,32 @@ export default function Reports({ go }) {
           <span>Grave ou anexe um áudio para gerar um relatório.</span>
         </div>
       ) : (
-        <div className="recent-list">
-          {reports.map((r) => (
-            <button
-              key={r.id}
-              className="recent-card"
-              onClick={() => r.status === "done" && go("report", r)}
-            >
-              <span className="recent-icon"><FileText size={20} /></span>
-              <span className="recent-info">
-                <span className="r-title" style={{ display: "block" }}>{r.title}</span>
-
-                {r.status === "done" ? (
-                  <span className="r-meta" style={{ display: "block" }}>
-                    Pronto{r.durationSec ? ` · ${Math.round(r.durationSec / 60)} min` : ""}
-                  </span>
-                ) : r.status === "error" ? (
-                  <span className="r-meta" style={{ display: "block", color: "#c0392b" }}>
-                    Erro ao processar
-                  </span>
-                ) : (
-                  <>
-                    <span className="r-meta" style={{ display: "block" }}>
-                      {r.stage || "Processando…"}
-                    </span>
-                    <span className="proc-bar">
-                      <i style={{ width: `${r.progress || 5}%` }} />
-                    </span>
-                  </>
-                )}
-              </span>
-
-              {r.status === "done" ? (
-                <span className="chev"><Chevron size={18} /></span>
-              ) : r.status === "error" ? null : (
-                <span className="proc-pct">{r.progress || 0}%</span>
-              )}
-
-              <span
-                className="del-btn"
-                role="button"
-                tabIndex={0}
-                title="Excluir"
-                aria-label="Excluir relatório"
-                onClick={(e) => handleDelete(e, r)}
-                style={{ marginLeft: 8, padding: 6, color: "#c0392b", display: "inline-flex", cursor: "pointer", flex: "0 0 auto" }}
+        <>
+          <div className="rpt-filter">
+            {PERIODS.map((p) => (
+              <button
+                key={p.key}
+                className={period === p.key ? "active" : ""}
+                onClick={() => setPeriod(p.key)}
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M3 6h18" /><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                  <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-                </svg>
-              </span>
-            </button>
-          ))}
-        </div>
+                {p.label}
+              </button>
+            ))}
+          </div>
+
+          {groups.length === 0 ? (
+            <p className="rec-status-msg" style={{ margin: "20px auto" }}>
+              Nenhum relatório neste período.
+            </p>
+          ) : (
+            groups.map((g) => (
+              <div key={g.key}>
+                <div className="rpt-group-h">{g.label}</div>
+                <div className="recent-list">{g.items.map(renderCard)}</div>
+              </div>
+            ))
+          )}
+        </>
       )}
     </div>
   )

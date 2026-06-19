@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react"
 import { Mic, Plus, FileText } from "../icons.jsx"
 import WaveHeader from "../components/WaveHeader.jsx"
+import SideMenu from "../components/SideMenu.jsx"
 import { useAuth } from "../auth.jsx"
 import { createReport } from "../lib/reports.js"
 
@@ -17,24 +18,32 @@ export default function Home({ go }) {
   const { user, logout } = useAuth()
   const nome = user?.displayName || user?.email?.split("@")[0] || "usuário"
   const [recording, setRecording] = useState(false)
+  const [paused, setPaused] = useState(false)
   const [secs, setSecs] = useState(0)
   const [status, setStatus] = useState(null) // texto de feedback
   const [busy, setBusy] = useState(false)
+  const [menu, setMenu] = useState(false)
 
   const fileRef = useRef()
   const timer = useRef()
   const mediaRec = useRef(null)
   const chunks = useRef([])
-  const startedAt = useRef(0)
+  const secsRef = useRef(0) // espelha os segundos para calcular a duração no stop
 
+  // O cronômetro só conta quando está gravando e NÃO está em pausa
   useEffect(() => {
-    if (recording) {
-      timer.current = setInterval(() => setSecs((s) => s + 1), 1000)
+    if (recording && !paused) {
+      timer.current = setInterval(() => {
+        setSecs((s) => {
+          secsRef.current = s + 1
+          return s + 1
+        })
+      }, 1000)
     } else {
       clearInterval(timer.current)
     }
     return () => clearInterval(timer.current)
-  }, [recording])
+  }, [recording, paused])
 
   // Para automaticamente ao atingir 1h30 de gravação
   useEffect(() => {
@@ -51,13 +60,13 @@ export default function Home({ go }) {
       rec.onstop = async () => {
         stream.getTracks().forEach((t) => t.stop())
         const blob = new Blob(chunks.current, { type: rec.mimeType || "audio/webm" })
-        const dur = Math.round((Date.now() - startedAt.current) / 1000)
-        await sendAudio(blob, `Gravação ${new Date().toLocaleString("pt-BR")}`, dur)
+        await sendAudio(blob, `Gravação ${new Date().toLocaleString("pt-BR")}`, secsRef.current)
       }
       mediaRec.current = rec
-      startedAt.current = Date.now()
+      secsRef.current = 0
       rec.start()
       setSecs(0)
+      setPaused(false)
       setRecording(true)
     } catch (e) {
       setStatus("Não foi possível acessar o microfone.")
@@ -65,8 +74,21 @@ export default function Home({ go }) {
     }
   }
 
+  function togglePause() {
+    const rec = mediaRec.current
+    if (!rec) return
+    if (rec.state === "recording") {
+      rec.pause()
+      setPaused(true)
+    } else if (rec.state === "paused") {
+      rec.resume()
+      setPaused(false)
+    }
+  }
+
   function stopRecording() {
     setRecording(false)
+    setPaused(false)
     mediaRec.current?.stop()
   }
 
@@ -106,15 +128,24 @@ export default function Home({ go }) {
 
   return (
     <div className="screen home-min">
+      <SideMenu
+        open={menu}
+        onClose={() => setMenu(false)}
+        nome={nome}
+        go={go}
+        logout={logout}
+        active="home"
+      />
+
       <WaveHeader>
         <div className="topbar">
-          <span style={{ width: 40 }} />
-          <div className="title">controllerHub</div>
-          <button className="icon-btn ghost" onClick={logout} title="Sair">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><path d="M16 17l5-5-5-5" /><path d="M21 12H9" />
+          <button className="icon-btn ghost" onClick={() => setMenu(true)} title="Menu" aria-label="Abrir menu">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <path d="M3 6h18" /><path d="M3 12h18" /><path d="M3 18h18" />
             </svg>
           </button>
+          <div className="title">controllerHub</div>
+          <span style={{ width: 40 }} />
         </div>
         <div className="home-greet">Olá, {nome}</div>
         <div className="home-greet-sub">Pronto para gravar?</div>
@@ -130,9 +161,26 @@ export default function Home({ go }) {
           {recording ? <span className="stop-square" /> : <Mic size={52} />}
         </button>
         <div className="rec-hint">
-          {recording ? <span className="rec-timer-big">{fmt(secs)}</span>
+          {recording ? <span className="rec-timer-big">{fmt(secs)}{paused ? " · pausado" : ""}</span>
             : busy ? "Processando..." : "Toque para gravar"}
         </div>
+
+        {recording && (
+          <button className="pause-btn" onClick={togglePause}>
+            {paused ? (
+              <>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+                Retomar
+              </>
+            ) : (
+              <>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" /><rect x="14" y="5" width="4" height="14" /></svg>
+                Pausar
+              </>
+            )}
+          </button>
+        )}
+
         {status && <p className="rec-status-msg">{status}</p>}
       </div>
 

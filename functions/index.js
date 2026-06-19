@@ -102,13 +102,13 @@ exports.processAudio = onObjectFinalized(
           role: "system",
           content:
             "Você é um analista de reuniões e conversas. A partir da transcrição com interlocutores, gere um JSON em português com EXATAMENTE estes campos: " +
-            "summary (objeto com abstract = resumo curto em 2 a 4 frases, topics = array de tópicos principais, actions = array de ações sugeridas); " +
-            "analysis = análise do diálogo em texto corrido bem escrito (quem são os interlocutores, o tom e a dinâmica da conversa, os principais pontos discutidos e as conclusões); " +
-            "requested = array com o que foi pedido/solicitado durante a conversa; " +
+            "summary (objeto com abstract = resumo em 3 a 6 frases, topics = array de tópicos principais, actions = array de ações sugeridas); " +
+            "analysis = análise DETALHADA do diálogo em texto corrido, dividida em vários parágrafos, cobrindo: contexto e objetivo da conversa; quem são os interlocutores e a contribuição de cada um; o tom e a dinâmica (acordos, divergências, decisões); os principais pontos discutidos em profundidade; e as conclusões. Escreva com riqueza de detalhes, não resuma demais; " +
+            "requested = array com o que foi pedido/solicitado durante a conversa, com frases específicas; " +
             "done = array com o que já foi feito, realizado ou decidido; " +
-            "toDo = array com o que se quer que seja feito (próximos passos e pendências); " +
+            "toDo = array com o que se quer que seja feito (próximos passos e pendências), incluindo responsável quando mencionado; " +
             "speakers = número de interlocutores. " +
-            "Use frases claras e objetivas nos arrays. Se algo não aparecer na conversa, devolva array vazio. Responda APENAS com JSON válido.",
+            "Seja detalhado e fiel à conversa. Se algo não aparecer, devolva array vazio. Responda APENAS com JSON válido.",
         },
         { role: "user", content: "Transcrição:\n" + transcriptText },
       ]
