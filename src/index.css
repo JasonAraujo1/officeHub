@@ -880,3 +880,61 @@ html, body { background: #000; }
 
 /* botão excluir evento no modal */
 .ev-del { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--surface-2); color: var(--ink-2); flex: 0 0 auto; }
+
+/* ===================================================================
+   FUNÇÕES — widget de usuário / configs, telas de perfil e settings
+=================================================================== */
+.user-widget {
+  width: 100%; display: flex; align-items: center; gap: 14px;
+  background: var(--surface-2); border-radius: var(--r-lg); padding: 16px;
+  text-align: left; margin: 6px 0 10px;
+}
+.user-widget-avatar { width: 52px; height: 52px; border-radius: 50%; background: var(--mint); color: #000; display: grid; place-items: center; font-weight: 800; font-size: 20px; flex: 0 0 auto; }
+.user-widget-info { flex: 1; min-width: 0; }
+.user-widget-name { font-size: 16px; font-weight: 800; color: var(--ink); }
+.user-widget-email { font-size: 12.5px; font-weight: 500; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.role-badge { display: inline-flex; align-items: center; gap: 5px; padding: 6px 11px; border-radius: 999px; background: rgba(0,0,0,.08); color: var(--ink-2); font-size: 12px; font-weight: 700; flex: 0 0 auto; }
+.role-badge.admin { background: var(--c-purple); color: #fff; }
+
+.config-widget {
+  width: 100%; display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto;
+  column-gap: 14px; align-items: center;
+  background: var(--surface-2); border-radius: var(--r-lg); padding: 16px; text-align: left; margin-bottom: 10px;
+}
+.config-widget .config-ic { grid-row: 1 / 3; width: 46px; height: 46px; border-radius: 14px; background: var(--dark); color: #fff; display: grid; place-items: center; }
+.config-widget .config-label { font-size: 16px; font-weight: 800; color: var(--ink); align-self: end; }
+.config-widget .config-sub { font-size: 12.5px; font-weight: 500; color: var(--ink-3); align-self: start; }
+
+.settings-section { font-size: 13px; font-weight: 800; color: var(--ink-3); margin: 16px 0 10px; }
+.list-card { background: var(--surface); border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--shadow-sm); }
+.row-item { width: 100%; display: flex; align-items: center; gap: 12px; padding: 16px; text-align: left; background: transparent; }
+.row-item + .row-item { border-top: 1px solid var(--line); }
+.row-item .row-ic { width: 34px; height: 34px; border-radius: 10px; background: var(--surface-2); color: var(--ink); display: grid; place-items: center; flex: 0 0 auto; }
+.row-item .row-label { font-size: 15px; font-weight: 600; color: var(--ink); flex: 1; }
+.row-item .row-label.sub { font-size: 13px; font-weight: 500; color: var(--ink-2); line-height: 1.5; }
+.row-item .row-value { font-size: 14px; font-weight: 600; color: var(--ink-3); }
+.row-item.danger .row-label { color: #d23b3b; }
+.row-item.danger .row-ic { color: #d23b3b; }
+
+.profile-head { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 24px 0 20px; }
+.profile-avatar { width: 84px; height: 84px; border-radius: 50%; background: var(--mint); color: #000; display: grid; place-items: center; font-weight: 800; font-size: 34px; }
+.profile-name { font-size: 22px; font-weight: 800; color: var(--ink); margin-top: 6px; }
+.profile-email { font-size: 14px; font-weight: 500; color: var(--ink-3); }
+.profile-head .role-badge { margin-top: 8px; }
+
+/* ===================================================================
+   CORREÇÃO — nav inferior consistente + reserva de espaço com área segura
+=================================================================== */
+:root { --nav-h: 76px; }
+.bottom-nav {
+  height: auto;
+  padding-top: 12px;
+  padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+}
+/* o conteúdo reserva a altura da nav + a área segura, para a barra não cobrir */
+.screen.has-nav { padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px) + 20px); }
+.home-body { padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px) + 20px); }
+
+/* header um pouco mais baixo */
+.home-header { min-height: 34vh; }

@@ -6,12 +6,15 @@ import Calendar from "./screens/Calendar.jsx"
 import Widgets from "./screens/Widgets.jsx"
 import Record from "./screens/Record.jsx"
 import Attach from "./screens/Attach.jsx"
+import Profile from "./screens/Profile.jsx"
+import Settings from "./screens/Settings.jsx"
+import Support from "./screens/Support.jsx"
 import Login from "./screens/Login.jsx"
 import BottomNav from "./components/BottomNav.jsx"
 import { AuthProvider, useAuth } from "./auth.jsx"
 import { isConfigured } from "./firebase.js"
 
-const SCREENS = { home: Home, reports: Reports, report: Report, calendar: Calendar, widgets: Widgets, record: Record, attach: Attach }
+const SCREENS = { home: Home, reports: Reports, report: Report, calendar: Calendar, widgets: Widgets, record: Record, attach: Attach, profile: Profile, settings: Settings, support: Support }
 const NAV_TABS = ["home", "reports", "calendar", "widgets"]
 
 // Cor do topo (barra de status) por tela — para a barra "continuar" a tela.
