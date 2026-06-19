@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Home from "./screens/Home.jsx"
 import Reports from "./screens/Reports.jsx"
 import Report from "./screens/Report.jsx"
@@ -14,12 +14,32 @@ import { isConfigured } from "./firebase.js"
 const SCREENS = { home: Home, reports: Reports, report: Report, calendar: Calendar, widgets: Widgets, record: Record, attach: Attach }
 const NAV_TABS = ["home", "reports", "calendar", "widgets"]
 
+// Cor do topo (barra de status) por tela — para a barra "continuar" a tela.
+const SCREEN_THEME = {
+  home: "#ffffff",
+  reports: "#ffc7ab",
+  report: "#ffc7ab",
+  calendar: "#ffffff",
+  widgets: "#ffffff",
+  record: "#b7ffa9",
+  attach: "#b7ffa9",
+}
+function setThemeColor(color) {
+  const m = document.querySelector('meta[name="theme-color"]')
+  if (m) m.setAttribute("content", color)
+}
+
 function Shell() {
   const { user, loading } = useAuth()
   const [screen, setScreen] = useState("home")
   const [payload, setPayload] = useState(null)
 
   const go = (s, data = null) => { setPayload(data); setScreen(s); window.scrollTo({ top: 0 }) }
+
+  useEffect(() => {
+    const color = !user ? "#ffffff" : (SCREEN_THEME[screen] || "#ffffff")
+    setThemeColor(color)
+  }, [screen, user, loading])
 
   if (!isConfigured) {
     return (
