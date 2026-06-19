@@ -12,7 +12,7 @@ export default function Report({ go, item }) {
   const transcript = r.transcript || []
 
   return (
-    <div className="screen">
+    <div className="screen report-screen">
       <div className="topbar">
         <button className="round-btn" onClick={() => go("reports")} aria-label="Voltar"><Back size={20} /></button>
         <div className="title center">Relatório</div>
@@ -32,7 +32,7 @@ export default function Report({ go, item }) {
         </div>
       </div>
 
-      {r.audioUrl && <AudioPlayer src={r.audioUrl} />}
+      {r.audioUrl && <AudioPlayer src={r.audioUrl} wavePlayed="#000000" waveRest="rgba(0,0,0,0.3)" sideBg="#f0bba1" />}
 
       <div className="tabs">
         <button className={tab === "resumo" ? "active" : ""} onClick={() => setTab("resumo")}>Resumo</button>
@@ -135,7 +135,7 @@ export default function Report({ go, item }) {
       )}
 
       <button className="btn-primary" onClick={() => generateReportPdf(r)}><Download size={18} /> Exportar PDF</button>
-      <button className="btn-primary" style={{ background: "var(--card-2)", color: "var(--ink)", border: "none", marginTop: 12 }} onClick={() => generateTranscriptPdf(r)}><Download size={18} /> Baixar Descrição Completa</button>
+      <button className="btn-primary" style={{ background: "#f0bba1", color: "#000", border: "none", marginTop: 12 }} onClick={() => generateTranscriptPdf(r)}><Download size={18} /> Baixar Descrição Completa</button>
     </div>
   )
 }

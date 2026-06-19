@@ -1,5 +1,5 @@
 import {
-  collection, doc, setDoc, deleteDoc, onSnapshot, query, orderBy, serverTimestamp,
+  collection, doc, setDoc, deleteDoc, updateDoc, onSnapshot, query, orderBy, serverTimestamp,
 } from "firebase/firestore"
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage"
 import { db, storage, auth } from "../firebase.js"
@@ -57,4 +57,10 @@ export async function deleteReport(report) {
       console.warn("Áudio já removido ou inacessível:", e)
     }
   }
+}
+
+// Renomeia o título do relatório.
+export async function renameReport(report, title) {
+  const u = uid()
+  await updateDoc(doc(db, "users", u, "reports", report.id), { title })
 }

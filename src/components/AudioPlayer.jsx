@@ -2,13 +2,6 @@ import { useEffect, useMemo, useRef, useState } from "react"
 
 // Player de áudio no estilo Google Recorder: waveform clicável (tan/azul),
 // tempos e barra de controles CIRCULARES (voltar 5s · play/pause salmão · avançar 10s).
-const CENTER_BG = "#181a20"   // botão central (escuro)
-const CENTER_IC = "#ffffff"
-const SIDE_BG = "#f6f6f8"     // botões laterais (claro)
-const SIDE_IC = "#16171d"
-const WAVE_PLAYED = "#181a20" // parte tocada (escuro)
-const WAVE_REST = "#e4e2ea"   // restante (cinza claro)
-
 function fmt(s) {
   if (!isFinite(s) || s < 0) return "0:00"
   const m = Math.floor(s / 60)
@@ -16,7 +9,15 @@ function fmt(s) {
   return `${m}:${ss}`
 }
 
-export default function AudioPlayer({ src }) {
+export default function AudioPlayer({
+  src,
+  centerBg = "#181a20", centerIc = "#ffffff",
+  sideBg = "#f6f6f8", sideIc = "#16171d",
+  wavePlayed = "#181a20", waveRest = "#e4e2ea",
+}) {
+  const CENTER_BG = centerBg, CENTER_IC = centerIc
+  const SIDE_BG = sideBg, SIDE_IC = sideIc
+  const WAVE_PLAYED = wavePlayed, WAVE_REST = waveRest
   const audio = useRef(null)
   const [playing, setPlaying] = useState(false)
   const [cur, setCur] = useState(0)

@@ -768,3 +768,93 @@ html, body { background: #000; }
 .screen.auth, .screen.has-nav:not(.home), .rec-screen, .attach-screen { background: var(--app-bg); }
 .rec-screen { background: var(--green); }
 .attach-screen { background: var(--green); }
+
+/* widgets Relatórios/Calendário: maiores e quadrados */
+.stat-card { aspect-ratio: 1 / 1; min-height: 0; }
+
+/* ===================================================================
+   ABA RELATÓRIOS — fundo #ffc7ab, detalhes #e3824a e preto
+=================================================================== */
+.screen.has-nav.reports-screen { background: #ffc7ab; }
+.reports-screen .round-btn { background: rgba(0,0,0,.10); color: #000; }
+.reports-screen .recent-icon { background: #e3824a; color: #000; }
+.reports-screen .proc-bar i { background: #e3824a; }
+.reports-screen .proc-pct { color: #000; }
+.reports-screen .del-btn { color: #000; }
+.reports-screen .rpt-filter button { background: rgba(0,0,0,.06); color: #000; }
+.reports-screen .rpt-filter button.active { background: #000; color: #fff; }
+.reports-screen .rpt-group-h { color: rgba(0,0,0,.6); }
+.reports-screen .empty-ic { background: #e3824a; color: #000; }
+.reports-screen .empty p { color: #000; }
+
+/* ===================================================================
+   DETALHE DO RELATÓRIO — fundo #ffc7ab, detalhes #e3824a e preto
+=================================================================== */
+.report-screen { background: #ffc7ab; }
+.report-screen .round-btn { background: rgba(0,0,0,.10); color: #000; }
+.report-screen .meta { background: rgba(0,0,0,.06); }
+.report-screen .meta .v { color: #000; }
+.report-screen .tabs { background: rgba(0,0,0,.06); }
+.report-screen .tabs button { color: rgba(0,0,0,.55); }
+.report-screen .tabs button.active { background: #fff; color: #000; }
+.report-screen .tick,
+.report-screen .tick.m,
+.report-screen .tick.l { background: #e3824a; color: #000; }
+.report-screen .summary-text { color: rgba(0,0,0,.7); }
+.report-screen .btn-primary.secondary { background: rgba(0,0,0,.08); color: #000; }
+
+/* cards de relatório: fundo #e3824a, ícone sem fundo, lixeira preta */
+.reports-screen .recent-card { background: #e3824a; }
+.reports-screen .recent-icon { background: transparent; color: #000; }
+.reports-screen .recent-card .r-title { color: #000; }
+.reports-screen .recent-card .r-meta { color: rgba(0,0,0,.6); }
+.reports-screen .recent-card .chev { color: #000; }
+.reports-screen .del-btn { color: #000; }
+
+/* Relatórios: mais distância entre o título e os filtros + ícone do card maior */
+.reports-screen .rpt-filter { margin-top: 22px; }
+.reports-screen .recent-icon { width: 52px; height: 52px; }
+
+/* card de arquivo (relatório): novo fundo */
+.reports-screen .recent-card { background: #f0bba1; }
+
+/* minigráficos dos widgets mais altos (sem mudar a altura do widget) */
+.mini-bars { height: 54px; }
+
+/* data/hora sutil no card de relatório */
+.r-when { font-size: 11px; color: rgba(0,0,0,.45); margin-top: 2px; font-weight: 500; }
+
+/* detalhe do relatório: meta e abas em #f0bba1 */
+.report-screen .meta { background: #f0bba1; }
+.report-screen .tabs { background: #f0bba1; }
+.report-screen .tabs button.active { background: #fff; color: #000; }
+
+/* abas do relatório: tabs minimalistas (texto + sublinhado) */
+.report-screen .tabs {
+  background: transparent; padding: 0; gap: 24px; border-radius: 0;
+  border-bottom: 1px solid rgba(0,0,0,.14); justify-content: flex-start;
+}
+.report-screen .tabs button {
+  flex: 0 0 auto; padding: 0 0 10px; border-radius: 0; background: transparent;
+  color: rgba(0,0,0,.5); font-weight: 600; position: relative; box-shadow: none;
+}
+.report-screen .tabs button.active { background: transparent; color: #000; box-shadow: none; }
+.report-screen .tabs button.active::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -1px;
+  height: 2.5px; background: #e3824a; border-radius: 2px;
+}
+
+/* transcrição em preto + barra da aba ativa preta */
+.report-screen .seg .who,
+.report-screen .seg .who.s2,
+.report-screen .seg .who.s3 { color: #000; }
+.report-screen .seg .ts { color: rgba(0,0,0,.55); }
+.report-screen .seg p { color: #000; }
+.report-screen .tabs button.active::after { background: #000; }
+
+/* botão "Baixar Descrição Completa" em #e3824a */
+.report-screen .btn-primary.secondary { background: #e3824a; color: #fff; }
+
+/* meta cards do relatório: textos pretos */
+.report-screen .meta .k { color: #000; }
+.report-screen .meta .v { color: #000; }
