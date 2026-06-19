@@ -1,5 +1,5 @@
 import {
-  collection, doc, setDoc, deleteDoc, updateDoc, onSnapshot, query, orderBy, serverTimestamp,
+  collection, doc, setDoc, deleteDoc, updateDoc, arrayUnion, onSnapshot, query, orderBy, serverTimestamp,
 } from "firebase/firestore"
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage"
 import { db, storage, auth } from "../firebase.js"
@@ -63,4 +63,10 @@ export async function deleteReport(report) {
 export async function renameReport(report, title) {
   const u = uid()
   await updateDoc(doc(db, "users", u, "reports", report.id), { title })
+}
+
+// Define os usuários marcados no relatório.
+export async function setReportTags(report, taggedUids, taggedNames) {
+  const u = uid()
+  await updateDoc(doc(db, "users", u, "reports", report.id), { taggedUids, taggedNames })
 }

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { Plus, FileText, Calendar, Menu, Mic, Paperclip, Clock, Bell, Check, Sparkle, FileSolid, CalendarSolid, MicSolid } from "../icons.jsx"
 import SideMenu from "../components/SideMenu.jsx"
+import NotifBell from "../components/Bell.jsx"
 import { useAuth } from "../auth.jsx"
 import { subscribeReports } from "../lib/reports.js"
 import { events } from "../data.js"
@@ -48,7 +49,10 @@ export default function Home({ go }) {
               <div className="who-name">{nome}</div>
             </div>
           </div>
-          <button className="round-btn" onClick={() => setMenu(true)} aria-label="Menu"><Menu size={20} /></button>
+          <div style={{ display: "flex", gap: 8 }}>
+            <NotifBell go={go} />
+            <button className="round-btn" onClick={() => setMenu(true)} aria-label="Menu"><Menu size={20} /></button>
+          </div>
         </div>
         <div className="home-head-text">
           <div className="date-label">{TODAY_LABEL}</div>

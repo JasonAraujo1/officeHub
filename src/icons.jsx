@@ -147,3 +147,6 @@ export const Mail = (p) => (
 export const Chat = (p) => (
   <S {...p}><path d="M21 11.5a8.5 8.5 0 0 1-12.3 7.6L3 21l1.9-5.7A8.5 8.5 0 1 1 21 11.5z"/></S>
 )
+
+export const UserPlus = (p) => (<S {...p}><circle cx="9" cy="8" r="4"/><path d="M3 21a6 6 0 0 1 12 0"/><path d="M19 8v6M22 11h-6"/></S>)
+export const Users = (p) => (<S {...p}><circle cx="9" cy="8" r="3.5"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8"/><path d="M21.5 20a6 6 0 0 0-5-5.9"/></S>)

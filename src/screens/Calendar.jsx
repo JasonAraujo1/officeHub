@@ -3,7 +3,9 @@ import { Back, Menu, Plus, ChevronLeft, ChevronRight, Check, X } from "../icons.
 import SideMenu from "../components/SideMenu.jsx"
 import { useAuth } from "../auth.jsx"
 import { eventCategories, calRef } from "../data.js"
-import { subscribeEvents, createEvent, deleteEvent } from "../lib/events.js"
+import { subscribeEvents, subscribeTaggedEvents, createEvent, deleteEvent } from "../lib/events.js"
+import { subscribeConnections } from "../lib/team.js"
+import { notify } from "../lib/notifications.js"
 
 const WEEKDAYS = ["seg", "ter", "qua", "qui", "sex", "sab", "dom"]
 const MONTHS = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"]
@@ -24,13 +26,24 @@ export default function Calendar({ go }) {
   const [modal, setModal] = useState(null)        // visualização
   const [add, setAdd] = useState(null)            // formulário de adicionar
   const [view, setView] = useState({ year: calRef.year, month: calRef.month })
-  const [evts, setEvts] = useState([])
+  const [ownEvts, setOwnEvts] = useState([])
+  const [taggedEvts, setTaggedEvts] = useState([])
+  const [connections, setConnections] = useState([])
+  const myUid = user?.uid
 
   useEffect(() => {
-    let unsub
-    try { unsub = subscribeEvents((list) => setEvts(list)) } catch (e) { console.error(e) }
-    return () => unsub && unsub()
+    const subs = []
+    try { subs.push(subscribeEvents((list) => setOwnEvts(list))) } catch (e) { console.error(e) }
+    try { subs.push(subscribeTaggedEvents((list) => setTaggedEvts(list))) } catch (e) { console.error(e) }
+    try { subs.push(subscribeConnections(setConnections)) } catch (e) { console.error(e) }
+    return () => subs.forEach((u) => u && u())
   }, [])
+
+  const evts = useMemo(() => {
+    const map = new Map()
+    for (const e of [...ownEvts, ...taggedEvts]) map.set(e.id, e)
+    return [...map.values()]
+  }, [ownEvts, taggedEvts])
 
   const isCurrentMonth = view.year === calRef.year && view.month === calRef.month
 
@@ -85,19 +98,30 @@ export default function Calendar({ go }) {
 
   function openAdd(day, type) {
     setModal(null)
-    setAdd({ day: day || (isCurrentMonth ? TODAY : 1), type: type || "tarefa", title: "", time: "" })
+    setAdd({ day: day || (isCurrentMonth ? TODAY : 1), type: type || "tarefa", title: "", time: "", tagged: [] })
+  }
+  function toggleTag(uid) {
+    setAdd((a) => ({ ...a, tagged: a.tagged.includes(uid) ? a.tagged.filter((x) => x !== uid) : [...a.tagged, uid] }))
   }
   async function saveAdd() {
     if (!add.title.trim()) return
+    const taggedUids = add.tagged || []
+    const taggedNames = connections.filter((c) => taggedUids.includes(c.uid)).map((c) => c.name)
+    const title = add.title.trim()
     try {
       await createEvent({
-        title: add.title.trim(),
-        type: add.type,
-        day: Number(add.day) || 1,
-        month: view.month,
-        year: view.year,
+        title, type: add.type,
+        day: Number(add.day) || 1, month: view.month, year: view.year,
         time: add.time.trim() || "—",
+        taggedUids, taggedNames,
       })
+      for (const uid of taggedUids) {
+        notify(uid, {
+          title: `Você foi marcado em "${title}"`,
+          body: `${Number(add.day) || 1}/${view.month + 1} · ${add.time.trim() || "—"} · ${typeInfo[add.type].label}`,
+          type: "event",
+        }).catch(() => {})
+      }
     } catch (e) { console.error(e); alert("Não foi possível salvar a tarefa.") }
     setAdd(null)
   }
@@ -183,7 +207,11 @@ export default function Calendar({ go }) {
                       {MONTHS[view.month]} {ev.day} · {ev.time} · {typeInfo[ev.type].label}
                     </span>
                   </span>
-                  <button className="ev-del" onClick={() => removeEvent(ev)} aria-label="Excluir"><X size={16} /></button>
+                  {(!ev.ownerUid || ev.ownerUid === myUid) ? (
+                    <button className="ev-del" onClick={() => removeEvent(ev)} aria-label="Excluir"><X size={16} /></button>
+                  ) : (
+                    <span className="ev-shared">@você</span>
+                  )}
                 </div>
               ))
             )}
@@ -235,6 +263,19 @@ export default function Calendar({ go }) {
                   placeholder="Ex.: 14:00" />
               </label>
             </div>
+
+            {connections.length > 0 && (
+              <div style={{ marginTop: 14 }}>
+                <span className="field" style={{ display: "block" }}><span style={{ fontSize: 13, fontWeight: 700, color: "var(--ink-2)" }}>Marcar usuários</span></span>
+                <div className="type-chips" style={{ marginTop: 8 }}>
+                  {connections.map((c) => (
+                    <button key={c.uid} className={`type-chip${add.tagged.includes(c.uid) ? " active" : ""}`} onClick={() => toggleTag(c.uid)}>
+                      @{c.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div style={{ display: "flex", gap: 10, marginTop: 18 }}>
               <button className="pill ghost" style={{ flex: 1, borderRadius: 16 }} onClick={() => setAdd(null)}><X size={18} /> Cancelar</button>

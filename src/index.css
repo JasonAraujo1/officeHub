@@ -938,3 +938,39 @@ html, body { background: #000; }
 
 /* header um pouco mais baixo */
 .home-header { min-height: 34vh; }
+
+/* ===================================================================
+   EQUIPE / CONTROLLER (Configurações)
+=================================================================== */
+.switch { width: 46px; height: 28px; border-radius: 999px; background: var(--line-strong); position: relative; flex: 0 0 auto; cursor: pointer; transition: background .2s; }
+.switch.on { background: var(--c-green); }
+.switch i { position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; transition: left .2s; }
+.switch.on i { left: 21px; }
+.invite-row { display: flex; gap: 8px; }
+.invite-row input { flex: 1; }
+.invite-row .pill { flex: 0 0 auto; padding: 0 16px; }
+.req-btn { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; flex: 0 0 auto; margin-left: 6px; }
+.req-btn.ok { background: var(--c-green); color: #06340f; }
+.req-btn.no { background: var(--surface-2); color: var(--ink-2); }
+
+/* ===================================================================
+   NOTIFICAÇÕES (sino + tela) e marcação
+=================================================================== */
+.bell-btn { position: relative; }
+.bell-badge { position: absolute; top: -2px; right: -2px; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 999px; background: var(--c-coral); color: #fff; font-size: 10px; font-weight: 800; display: grid; place-items: center; }
+.notif-list { display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
+.notif { display: flex; align-items: flex-start; gap: 10px; background: var(--surface-2); border-radius: var(--r-md); padding: 14px; cursor: pointer; }
+.notif.unread { background: var(--mint-soft); }
+.notif-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--c-coral); margin-top: 5px; flex: 0 0 auto; }
+.notif-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.notif-title { font-size: 14px; font-weight: 700; color: var(--ink); }
+.notif-body { font-size: 13px; font-weight: 500; color: var(--ink-2); }
+.notif-time { font-size: 11px; font-weight: 600; color: var(--ink-3); margin-top: 2px; }
+.notif-del { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: rgba(0,0,0,.06); color: var(--ink-2); flex: 0 0 auto; }
+
+/* barra de marcação no relatório */
+.tag-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 16px; }
+.person-chip { display: inline-flex; align-items: center; padding: 7px 12px; border-radius: 999px; background: rgba(0,0,0,.08); color: #000; font-size: 12.5px; font-weight: 700; }
+
+/* marca evento compartilhado (você foi marcado) */
+.ev-shared { font-size: 11px; font-weight: 700; color: var(--c-purple); flex: 0 0 auto; }
