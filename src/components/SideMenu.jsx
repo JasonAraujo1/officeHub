@@ -1,4 +1,11 @@
-// Menu lateral retrátil (drawer), no novo estilo claro.
+// Menu lateral retrátil (drawer) — fundo preto, itens nas cores das abas.
+const COLORS = {
+  home: "#b7ffa9",
+  reports: "#ffc7ab",
+  calendar: "#ebcefd",
+  widgets: "#9fc8fe",
+}
+
 export default function SideMenu({ open, onClose, nome, go, logout, active = "home" }) {
   const navTo = (screen) => { onClose?.(); go?.(screen) }
 
@@ -22,20 +29,21 @@ export default function SideMenu({ open, onClose, nome, go, logout, active = "ho
       <aside
         style={{
           position: "fixed", top: 0, left: 0, bottom: 0, width: 280, maxWidth: "84vw",
-          background: "#fff", zIndex: 61, boxSizing: "border-box",
+          background: "#000", zIndex: 61, boxSizing: "border-box",
           transform: open ? "translateX(0)" : "translateX(-100%)",
           transition: "transform .25s ease", display: "flex", flexDirection: "column",
           borderRadius: "0 28px 28px 0", overflow: "hidden",
         }}
       >
-        <div style={{ background: "var(--dark)", color: "#fff", padding: "26px 22px 22px" }}>
+        <div style={{ background: "#000", color: "#fff", padding: "28px 22px 22px" }}>
           <div style={{ fontWeight: 800, fontSize: 19, letterSpacing: "-0.3px" }}>controllerHub</div>
-          <div style={{ color: "#9aa0ab", fontSize: 13, marginTop: 3, fontWeight: 600 }}>Olá, {nome}</div>
+          <div style={{ color: "rgba(255,255,255,.5)", fontSize: 13, marginTop: 3, fontWeight: 600 }}>Olá, {nome}</div>
         </div>
 
         <nav style={{ padding: 12, flex: 1 }}>
           {items.map((it) => {
             const on = it.key === active
+            const color = COLORS[it.key] || "#fff"
             return (
               <button
                 key={it.key}
@@ -43,8 +51,8 @@ export default function SideMenu({ open, onClose, nome, go, logout, active = "ho
                 style={{
                   display: "flex", alignItems: "center", gap: 13, width: "100%",
                   padding: "14px 15px", border: "none", borderRadius: 16, cursor: "pointer",
-                  background: on ? "var(--mint-soft)" : "transparent",
-                  color: "var(--ink)", fontSize: 15, fontWeight: on ? 800 : 600,
+                  background: on ? "rgba(255,255,255,.10)" : "transparent",
+                  color, fontSize: 15, fontWeight: on ? 800 : 600,
                   textAlign: "left", marginBottom: 4,
                 }}
               >
@@ -61,8 +69,8 @@ export default function SideMenu({ open, onClose, nome, go, logout, active = "ho
           onClick={() => { onClose?.(); logout?.() }}
           style={{
             display: "flex", alignItems: "center", gap: 13, width: "100%",
-            padding: "18px 24px", border: "none", borderTop: "1px solid var(--line)",
-            background: "transparent", color: "#d23b3b", fontSize: 15, fontWeight: 700,
+            padding: "18px 24px", border: "none", borderTop: "1px solid rgba(255,255,255,.1)",
+            background: "transparent", color: "#f0bba1", fontSize: 15, fontWeight: 700,
             cursor: "pointer", textAlign: "left",
           }}
         >
