@@ -22,7 +22,7 @@ export default defineConfig({
         name: 'controllerHub',
         short_name: 'controllerHub',
         description: 'Grave, converta áudio em texto e gere relatórios inteligentes',
-        theme_color: '#111111',
+        theme_color: '#ffffff',
         background_color: '#ffffff',
         display: 'standalone',
         start_url: '/',

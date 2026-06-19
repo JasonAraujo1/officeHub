@@ -757,3 +757,14 @@ body { display: block; }
 @keyframes floaty1 { from { transform: translate(0,0) rotate(-10deg); } to { transform: translate(18px,-26px) rotate(12deg); } }
 @keyframes floaty2 { from { transform: translate(0,0) rotate(8deg); } to { transform: translate(-22px,-18px) rotate(-12deg); } }
 @keyframes floaty3 { from { transform: translate(0,0) rotate(-6deg); } to { transform: translate(16px,22px) rotate(10deg); } }
+
+/* ===================================================================
+   TOPO (status bar PWA) — branco continuando o header, laterais pretas
+=================================================================== */
+html, body { background: #000; }
+.app-shell { background: #000; }
+.home-header { padding-top: calc(env(safe-area-inset-top, 0px) + 20px); }
+/* telas claras continuam brancas mesmo com app-shell preto */
+.screen.auth, .screen.has-nav:not(.home), .rec-screen, .attach-screen { background: var(--app-bg); }
+.rec-screen { background: var(--green); }
+.attach-screen { background: var(--green); }
