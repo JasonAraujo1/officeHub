@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
-import { Back, FileText, Chevron } from "../icons.jsx"
-import WaveHeader from "../components/WaveHeader.jsx"
-import { subscribeReports, deleteReport } from "../lib/reports.js"
+import { Back, FileText, Chevron, Pencil } from "../icons.jsx"
+import { subscribeReports, deleteReport, renameReport } from "../lib/reports.js"
 
 // Converte o createdAt (Timestamp do Firestore, Date ou {seconds}) em Date
 function toDate(v) {
@@ -10,6 +9,11 @@ function toDate(v) {
   if (typeof v.seconds === "number") return new Date(v.seconds * 1000)
   const d = new Date(v)
   return isNaN(d) ? null : d
+}
+
+function fmtDateTime(d) {
+  if (!d) return ""
+  return d.toLocaleDateString("pt-BR") + " · " + d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })
 }
 
 const PERIODS = [
@@ -49,6 +53,20 @@ export default function Reports({ go }) {
     }
   }
 
+  async function handleRename(e, r) {
+    e.stopPropagation()
+    const novo = prompt("Novo nome do relatório:", r.title)
+    if (novo == null) return
+    const t = novo.trim()
+    if (!t || t === r.title) return
+    try {
+      await renameReport(r, t)
+    } catch (err) {
+      console.error(err)
+      alert("Não foi possível renomear. Tente novamente.")
+    }
+  }
+
   useEffect(() => {
     let unsub
     try {
@@ -82,9 +100,12 @@ export default function Reports({ go }) {
       className="recent-card"
       onClick={() => r.status === "done" && go("report", r)}
     >
-      <span className="recent-icon"><FileText size={20} /></span>
+      <span className="recent-icon"><FileText size={32} /></span>
       <span className="recent-info">
         <span className="r-title" style={{ display: "block" }}>{r.title}</span>
+        {toDate(r.createdAt) && (
+          <span className="r-when" style={{ display: "block" }}>{fmtDateTime(toDate(r.createdAt))}</span>
+        )}
 
         {r.status === "done" ? (
           <span className="r-meta" style={{ display: "block" }}>
@@ -113,13 +134,25 @@ export default function Reports({ go }) {
       )}
 
       <span
+        className="edit-btn"
+        role="button"
+        tabIndex={0}
+        title="Renomear"
+        aria-label="Renomear relatório"
+        onClick={(e) => handleRename(e, r)}
+        style={{ marginLeft: 4, padding: 6, color: "#000", display: "inline-flex", cursor: "pointer", flex: "0 0 auto" }}
+      >
+        <Pencil size={17} />
+      </span>
+
+      <span
         className="del-btn"
         role="button"
         tabIndex={0}
         title="Excluir"
         aria-label="Excluir relatório"
         onClick={(e) => handleDelete(e, r)}
-        style={{ marginLeft: 8, padding: 6, color: "#c0392b", display: "inline-flex", cursor: "pointer", flex: "0 0 auto" }}
+        style={{ marginLeft: 8, padding: 6, color: "#000", display: "inline-flex", cursor: "pointer", flex: "0 0 auto" }}
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M3 6h18" /><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
@@ -130,20 +163,18 @@ export default function Reports({ go }) {
   )
 
   return (
-    <div className="screen">
-      <WaveHeader compact>
-        <div className="topbar">
-          <button className="icon-btn ghost" onClick={() => go("home")}><Back /></button>
-          <div className="title">Relatórios</div>
-          <span style={{ width: 40 }} />
-        </div>
-      </WaveHeader>
+    <div className="screen has-nav reports-screen">
+      <div className="topbar">
+        <button className="round-btn" onClick={() => go("home")} aria-label="Voltar"><Back size={20} /></button>
+        <div className="title center">Relatórios</div>
+        <span style={{ width: 44 }} />
+      </div>
 
       {loading ? (
         <p className="rec-status-msg" style={{ margin: "20px auto" }}>Carregando…</p>
       ) : reports.length === 0 ? (
         <div className="empty">
-          <FileText size={40} />
+          <span className="empty-ic"><FileText size={36} /></span>
           <p>Nenhum relatório ainda.</p>
           <span>Grave ou anexe um áudio para gerar um relatório.</span>
         </div>
