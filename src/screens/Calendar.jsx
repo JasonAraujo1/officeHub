@@ -14,6 +14,7 @@ const NOW = new Date()
 const TODAY = NOW.getDate()
 const CUR_MONTH = NOW.getMonth()
 const CUR_YEAR = NOW.getFullYear()
+const YEARS = Array.from({ length: 11 }, (_, i) => CUR_YEAR - 5 + i)
 
 // tipos de evento (inclui "tarefa", além das 3 categorias dos widgets)
 const typeInfo = {
@@ -136,7 +137,7 @@ export default function Calendar({ go }) {
   }
 
   return (
-    <div className="screen has-nav">
+    <div className="screen has-nav cal-screen">
       <SideMenu open={menu} onClose={() => setMenu(false)} nome={nome} go={go} logout={logout} active="calendar" />
 
       <div className="topbar">
@@ -146,10 +147,13 @@ export default function Calendar({ go }) {
       </div>
 
       {/* navegação de meses (minimalista) */}
-      <div className="cal-nav">
-        <button onClick={() => shiftMonth(-1)} aria-label="Mês anterior"><ChevronLeft size={20} /></button>
-        <span className="cal-nav-label">{MONTHS_FULL[view.month]} {view.year}</span>
-        <button onClick={() => shiftMonth(1)} aria-label="Próximo mês"><ChevronRight size={20} /></button>
+      <div className="cal-nav cal-select">
+        <select value={view.month} onChange={(e) => setView((v) => ({ ...v, month: Number(e.target.value) }))} aria-label="Mês">
+          {MONTHS_FULL.map((m, i) => <option key={i} value={i}>{m}</option>)}
+        </select>
+        <select value={view.year} onChange={(e) => setView((v) => ({ ...v, year: Number(e.target.value) }))} aria-label="Ano">
+          {YEARS.map((y) => <option key={y} value={y}>{y}</option>)}
+        </select>
       </div>
 
       {/* grade do calendário */}

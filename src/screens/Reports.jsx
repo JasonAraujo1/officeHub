@@ -42,6 +42,7 @@ export default function Reports({ go }) {
   const [shared, setShared] = useState([])
   const [loading, setLoading] = useState(true)
   const [period, setPeriod] = useState("all")
+  const [mainTab, setMainTab] = useState("mine")
 
   async function handleDelete(e, r) {
     e.stopPropagation()
@@ -203,7 +204,7 @@ export default function Reports({ go }) {
 
       {loading ? (
         <p className="rec-status-msg" style={{ margin: "20px auto" }}>Carregando…</p>
-      ) : reports.length === 0 ? (
+      ) : (reports.length === 0 && sharedOnly.length === 0) ? (
         <div className="empty">
           <span className="empty-ic"><FileText size={36} /></span>
           <p>Nenhum relatório ainda.</p>
@@ -211,37 +212,43 @@ export default function Reports({ go }) {
         </div>
       ) : (
         <>
-          <div className="rpt-filter">
-            {PERIODS.map((p) => (
-              <button
-                key={p.key}
-                className={period === p.key ? "active" : ""}
-                onClick={() => setPeriod(p.key)}
-              >
-                {p.label}
-              </button>
-            ))}
+          <div className="rpt-tabs">
+            <button className={mainTab === "mine" ? "active" : ""} onClick={() => setMainTab("mine")}>Meus relatórios</button>
+            <button className={mainTab === "tagged" ? "active" : ""} onClick={() => setMainTab("tagged")}>@ marcados</button>
           </div>
 
-          {groups.length === 0 ? (
-            <p className="rec-status-msg" style={{ margin: "20px auto" }}>
-              Nenhum relatório neste período.
-            </p>
-          ) : (
-            groups.map((g) => (
-              <div key={g.key}>
-                <div className="rpt-group-h">{g.label}</div>
-                <div className="recent-list">{g.items.map(renderCard)}</div>
-              </div>
-            ))
-          )}
-        </>
-      )}
+          {mainTab === "mine" ? (
+            reports.length === 0 ? (
+              <p className="rec-status-msg" style={{ margin: "20px auto" }}>Você ainda não tem relatórios.</p>
+            ) : (
+              <>
+                <div className="rpt-filter">
+                  {PERIODS.map((p) => (
+                    <button key={p.key} className={period === p.key ? "active" : ""} onClick={() => setPeriod(p.key)}>
+                      {p.label}
+                    </button>
+                  ))}
+                </div>
 
-      {!loading && sharedOnly.length > 0 && (
-        <>
-          <div className="rpt-group-h">Compartilhados comigo</div>
-          <div className="recent-list">{sharedOnly.map(renderSharedCard)}</div>
+                {groups.length === 0 ? (
+                  <p className="rec-status-msg" style={{ margin: "20px auto" }}>Nenhum relatório neste período.</p>
+                ) : (
+                  groups.map((g) => (
+                    <div key={g.key}>
+                      <div className="rpt-group-h">{g.label}</div>
+                      <div className="recent-list">{g.items.map(renderCard)}</div>
+                    </div>
+                  ))
+                )}
+              </>
+            )
+          ) : (
+            sharedOnly.length === 0 ? (
+              <p className="rec-status-msg" style={{ margin: "20px auto" }}>Nenhum relatório marcado para você.</p>
+            ) : (
+              <div className="recent-list">{sharedOnly.map(renderSharedCard)}</div>
+            )
+          )}
         </>
       )}
     </div>

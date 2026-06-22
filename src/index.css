@@ -1040,3 +1040,24 @@ html, body { background: #000; }
 /* Safe areas (notch / barra inferior) como extensão do fundo da tela.
    O body recebe a cor da tela via JS; o shell fica transparente e reserva o topo. */
 .app-shell { background: transparent; padding-top: env(safe-area-inset-top, 0px); }
+
+/* CALENDÁRIO — fundo roxo, card fosco translúcido, selects de mês/ano */
+.screen.cal-screen { background: #c9a6f0; }
+.cal-screen .cal-card {
+  background: rgba(255, 255, 255, 0.28);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 24px;
+}
+.cal-select select {
+  appearance: none; -webkit-appearance: none;
+  background: rgba(255, 255, 255, 0.5); border: none; border-radius: 14px;
+  padding: 10px 18px; font-size: 15px; font-weight: 700; color: var(--ink);
+  cursor: pointer; text-align: center;
+}
+
+/* Tab trigger minimalista (Meus relatórios / @ marcados) */
+.rpt-tabs { display: inline-flex; gap: 4px; background: rgba(0, 0, 0, 0.07); border-radius: 999px; padding: 4px; margin-bottom: 14px; }
+.rpt-tabs button { padding: 8px 16px; border: none; background: transparent; border-radius: 999px; font-size: 13px; font-weight: 600; color: rgba(0, 0, 0, 0.55); cursor: pointer; }
+.rpt-tabs button.active { background: #fff; color: #000; }
