@@ -35,6 +35,10 @@ const SCREEN_THEME = {
 function setThemeColor(color) {
   const m = document.querySelector('meta[name="theme-color"]')
   if (m) m.setAttribute("content", color)
+  // faz as áreas seguras (notch / barra inferior) herdarem a cor da tela,
+  // em vez de aparecerem pretas — equivalente web do SafeAreaView.
+  document.body.style.backgroundColor = color
+  document.documentElement.style.backgroundColor = color
 }
 
 function Shell() {

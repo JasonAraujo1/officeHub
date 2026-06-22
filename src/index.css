@@ -1011,5 +1011,32 @@ html, body { background: #000; }
 .fn-tint { background: color-mix(in srgb, var(--fn) 22%, #fff); }
 
 /* Fundos coloridos por funcionalidade ao entrar na tela */
-.screen.notif-screen { background: #ffe7a3; }   /* Notificações: amarelo */
-.screen.fn-sub-screen { background: #cfe2fe; }   /* Usuário/Config/Suporte: azul claro (sub de Funções) */
+.screen.notif-screen { --fn: #ffd439; background: #ffe7a3; }   /* Notificações: amarelo */
+.screen.fn-sub-screen { --fn: #9fc8fe; background: #cfe2fe; }  /* Usuário/Config/Suporte: azul (sub de Funções) */
+
+/* Elementos na MESMA paleta do fundo (mais sutis ou mais fortes), como em Relatórios.
+   Tudo derivado de --fn via color-mix → degradê monocromático por tela. */
+.notif-screen .round-btn,
+.fn-sub-screen .round-btn { background: color-mix(in srgb, var(--fn) 45%, #fff); color: #000; }
+
+.notif-screen .card,
+.notif-screen .notif,
+.fn-sub-screen .card,
+.fn-sub-screen .user-widget,
+.fn-sub-screen .config-widget { background: color-mix(in srgb, var(--fn) 30%, #fff); }
+
+.notif-screen .notif.unread { background: color-mix(in srgb, var(--fn) 52%, #fff); }
+.notif-screen .notif-dot,
+.notif-screen .bell-badge { background: color-mix(in srgb, var(--fn) 70%, #000); color: #000; }
+.notif-screen .notif-del,
+.fn-sub-screen .config-ic,
+.fn-sub-screen .user-widget-avatar { background: color-mix(in srgb, var(--fn) 60%, #fff); color: #000; }
+
+.fn-sub-screen .settings-section { color: color-mix(in srgb, var(--fn) 65%, #000); }
+.fn-sub-screen .field input { background: color-mix(in srgb, var(--fn) 16%, #fff); }
+.fn-sub-screen .switch.on { background: color-mix(in srgb, var(--fn) 75%, #000); }
+.fn-sub-screen .role-badge { background: color-mix(in srgb, var(--fn) 45%, #fff); color: #000; }
+
+/* Safe areas (notch / barra inferior) como extensão do fundo da tela.
+   O body recebe a cor da tela via JS; o shell fica transparente e reserva o topo. */
+.app-shell { background: transparent; padding-top: env(safe-area-inset-top, 0px); }
