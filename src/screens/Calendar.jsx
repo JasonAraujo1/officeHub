@@ -6,6 +6,7 @@ import { eventCategories, calRef } from "../data.js"
 import { subscribeEvents, subscribeTaggedEvents, createEvent, deleteEvent } from "../lib/events.js"
 import { subscribeConnections } from "../lib/team.js"
 import { notify } from "../lib/notifications.js"
+import Kanban from "../components/Kanban.jsx"
 
 const WEEKDAYS = ["seg", "ter", "qua", "qui", "sex", "sab", "dom"]
 const MONTHS = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"]
@@ -30,6 +31,7 @@ export default function Calendar({ go }) {
   const [modal, setModal] = useState(null)        // visualização
   const [add, setAdd] = useState(null)            // formulário de adicionar
   const [view, setView] = useState({ year: CUR_YEAR, month: CUR_MONTH })
+  const [tab, setTab] = useState("cal")
   const [ownEvts, setOwnEvts] = useState([])
   const [taggedEvts, setTaggedEvts] = useState([])
   const [connections, setConnections] = useState([])
@@ -146,6 +148,15 @@ export default function Calendar({ go }) {
         <button className="round-btn" onClick={() => setMenu(true)} aria-label="Menu"><Menu size={20} /></button>
       </div>
 
+      <div className="rpt-tabs cal-tabs">
+        <button className={tab === "cal" ? "active" : ""} onClick={() => setTab("cal")}>Calendário</button>
+        <button className={tab === "act" ? "active" : ""} onClick={() => setTab("act")}>Atividades</button>
+      </div>
+
+      {tab === "act" && <Kanban />}
+
+      {tab === "cal" && (
+      <>
       {/* navegação de meses (minimalista) */}
       <div className="cal-nav cal-select">
         <select value={view.month} onChange={(e) => setView((v) => ({ ...v, month: Number(e.target.value) }))} aria-label="Mês">
@@ -194,6 +205,8 @@ export default function Calendar({ go }) {
           </button>
         ))}
       </div>
+      </>
+      )}
 
       {/* modal de visualização */}
       {modal && (
