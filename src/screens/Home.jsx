@@ -144,7 +144,7 @@ export default function Home({ go }) {
               <path d="M3 6h18" /><path d="M3 12h18" /><path d="M3 18h18" />
             </svg>
           </button>
-          <div className="title">controllerHub</div>
+          <div className="title">Controlaí</div>
           <span style={{ width: 40 }} />
         </div>
         <div className="home-greet">Olá, {nome}</div>

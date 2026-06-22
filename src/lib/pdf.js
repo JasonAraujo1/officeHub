@@ -156,7 +156,7 @@ export function generateReportPdf(report = {}) {
     doc.setFont("helvetica", "bold")
     doc.setFontSize(15)
     doc.setTextColor(255, 255, 255)
-    doc.text("controllerHub", margin, 38)
+    doc.text("Controlaí", margin, 38)
     doc.setFont("helvetica", "normal")
     doc.setFontSize(9.5)
     doc.setTextColor(...AMBER)
@@ -172,7 +172,7 @@ export function generateReportPdf(report = {}) {
     doc.setFont("helvetica", "normal")
     doc.setFontSize(8.5)
     doc.setTextColor(...GRAY)
-    doc.text("controllerHub · Relatório gerado por IA", margin, pageH - footerH + 16)
+    doc.text("Controlaí · Relatório gerado por IA", margin, pageH - footerH + 16)
     doc.text(`Página ${p} de ${total}`, pageW - margin, pageH - footerH + 16, { align: "right" })
   }
 
@@ -201,7 +201,7 @@ function drawChrome(doc, { pageW, pageH, margin, headerH, footerH, subtitle }) {
     doc.setFont("helvetica", "bold")
     doc.setFontSize(15)
     doc.setTextColor(255, 255, 255)
-    doc.text("controllerHub", margin, 38)
+    doc.text("Controlaí", margin, 38)
     doc.setFont("helvetica", "normal")
     doc.setFontSize(9.5)
     doc.setTextColor(...AMBER)
@@ -216,7 +216,7 @@ function drawChrome(doc, { pageW, pageH, margin, headerH, footerH, subtitle }) {
     doc.setFont("helvetica", "normal")
     doc.setFontSize(8.5)
     doc.setTextColor(...GRAY)
-    doc.text("controllerHub · Relatório gerado por IA", margin, pageH - footerH + 16)
+    doc.text("Controlaí · Relatório gerado por IA", margin, pageH - footerH + 16)
     doc.text(`Página ${p} de ${total}`, pageW - margin, pageH - footerH + 16, { align: "right" })
   }
 }

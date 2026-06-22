@@ -51,7 +51,7 @@ export default function Login() {
   return (
     <div className="screen">
       <WaveHeader>
-        <div className="greet-date">controllerHub</div>
+        <div className="greet-date">Controlaí</div>
         <h1 className="greet-h1">{mode === "login" ? "Entrar" : "Criar conta"}</h1>
         <p className="greet-sub">Grave, transcreva e gere relatórios.</p>
       </WaveHeader>

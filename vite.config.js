@@ -13,11 +13,11 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'icons/icon.svg'],
       manifest: {
-        name: 'controllerHub',
-        short_name: 'controllerHub',
+        name: 'Controlaí',
+        short_name: 'Controlaí',
         description: 'Grave, converta áudio em texto e gere relatórios inteligentes',
-        theme_color: '#111111',
-        background_color: '#ffffff',
+        theme_color: '#1f1b1a',
+        background_color: '#1f1b1a',
         display: 'standalone',
         start_url: '/',
         icons: [

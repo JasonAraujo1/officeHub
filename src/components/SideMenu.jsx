@@ -35,7 +35,7 @@ export default function SideMenu({ open, onClose, nome, go, logout, active = "ho
       >
         {/* cabeçalho do menu */}
         <div style={{ background: "#111", color: "#fff", padding: "22px 20px 18px" }}>
-          <div style={{ fontWeight: 700, fontSize: 18, letterSpacing: ".2px" }}>controllerHub</div>
+          <div style={{ fontWeight: 700, fontSize: 18, letterSpacing: ".2px" }}>Controlaí</div>
           <div style={{ color: AMBER, fontSize: 13, marginTop: 2 }}>Olá, {nome}</div>
         </div>
 
