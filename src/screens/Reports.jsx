@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
 import { Back, FileText, Chevron, Pencil } from "../icons.jsx"
-import { subscribeReports, deleteReport, renameReport } from "../lib/reports.js"
+import { subscribeReports, deleteReport, renameReport, subscribeSharedReports } from "../lib/reports.js"
 
 // Converte o createdAt (Timestamp do Firestore, Date ou {seconds}) em Date
 function toDate(v) {
@@ -39,6 +39,7 @@ function withinPeriod(date, period) {
 
 export default function Reports({ go }) {
   const [reports, setReports] = useState([])
+  const [shared, setShared] = useState([])
   const [loading, setLoading] = useState(true)
   const [period, setPeriod] = useState("all")
 
@@ -73,6 +74,17 @@ export default function Reports({ go }) {
       unsub = subscribeReports((list) => { setReports(list); setLoading(false) })
     } catch (e) {
       setLoading(false)
+      console.error(e)
+    }
+    return () => unsub && unsub()
+  }, [])
+
+  // Relatórios compartilhados comigo (fui marcado por outra pessoa)
+  useEffect(() => {
+    let unsub
+    try {
+      unsub = subscribeSharedReports(setShared)
+    } catch (e) {
       console.error(e)
     }
     return () => unsub && unsub()
@@ -162,6 +174,25 @@ export default function Reports({ go }) {
     </button>
   )
 
+  // só-leitura: relatórios que outra pessoa compartilhou comigo (não meus)
+  const renderSharedCard = (r) => (
+    <button key={r.id} className="recent-card" onClick={() => r.status === "done" && go("report", r)}>
+      <span className="recent-icon"><FileText size={32} /></span>
+      <span className="recent-info">
+        <span className="r-title" style={{ display: "block" }}>{r.title}</span>
+        {toDate(r.createdAt) && (
+          <span className="r-when" style={{ display: "block" }}>{fmtDateTime(toDate(r.createdAt))}</span>
+        )}
+        <span className="r-meta" style={{ display: "block" }}>
+          {r.status === "done" ? "Compartilhado com você" : r.status === "error" ? "Erro ao processar" : (r.stage || "Processando…")}
+        </span>
+      </span>
+      {r.status === "done" && <span className="chev"><Chevron size={18} /></span>}
+    </button>
+  )
+
+  const sharedOnly = shared.filter((s) => !reports.some((r) => r.id === s.id))
+
   return (
     <div className="screen has-nav reports-screen">
       <div className="topbar">
@@ -204,6 +235,13 @@ export default function Reports({ go }) {
               </div>
             ))
           )}
+        </>
+      )}
+
+      {!loading && sharedOnly.length > 0 && (
+        <>
+          <div className="rpt-group-h">Compartilhados comigo</div>
+          <div className="recent-list">{sharedOnly.map(renderSharedCard)}</div>
         </>
       )}
     </div>

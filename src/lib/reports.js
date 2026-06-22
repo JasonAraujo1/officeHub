@@ -1,5 +1,5 @@
 import {
-  collection, doc, setDoc, deleteDoc, updateDoc, arrayUnion, onSnapshot, query, orderBy, serverTimestamp,
+  collection, collectionGroup, doc, setDoc, deleteDoc, updateDoc, arrayUnion, onSnapshot, query, where, orderBy, serverTimestamp,
 } from "firebase/firestore"
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage"
 import { db, storage, auth } from "../firebase.js"
@@ -43,6 +43,14 @@ export async function createReport(blob, { title, durationSec = 0, ext = "webm" 
 export function subscribeReports(cb) {
   const u = uid()
   const q = query(collection(db, "users", u, "reports"), orderBy("createdAt", "desc"))
+  return onSnapshot(q, (snap) => cb(snap.docs.map((d) => d.data())))
+}
+
+// Assina os relatórios COMPARTILHADOS com o usuário atual (marcado em taggedUids),
+// estejam eles na pasta de qualquer outro usuário (busca por collectionGroup).
+export function subscribeSharedReports(cb) {
+  const u = uid()
+  const q = query(collectionGroup(db, "reports"), where("taggedUids", "array-contains", u))
   return onSnapshot(q, (snap) => cb(snap.docs.map((d) => d.data())))
 }
 
