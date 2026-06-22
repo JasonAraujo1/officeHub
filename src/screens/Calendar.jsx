@@ -10,7 +10,10 @@ import { notify } from "../lib/notifications.js"
 const WEEKDAYS = ["seg", "ter", "qua", "qui", "sex", "sab", "dom"]
 const MONTHS = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"]
 const MONTHS_FULL = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
-const TODAY = 19
+const NOW = new Date()
+const TODAY = NOW.getDate()
+const CUR_MONTH = NOW.getMonth()
+const CUR_YEAR = NOW.getFullYear()
 
 // tipos de evento (inclui "tarefa", além das 3 categorias dos widgets)
 const typeInfo = {
@@ -25,7 +28,7 @@ export default function Calendar({ go }) {
   const [menu, setMenu] = useState(false)
   const [modal, setModal] = useState(null)        // visualização
   const [add, setAdd] = useState(null)            // formulário de adicionar
-  const [view, setView] = useState({ year: calRef.year, month: calRef.month })
+  const [view, setView] = useState({ year: CUR_YEAR, month: CUR_MONTH })
   const [ownEvts, setOwnEvts] = useState([])
   const [taggedEvts, setTaggedEvts] = useState([])
   const [connections, setConnections] = useState([])
@@ -45,7 +48,7 @@ export default function Calendar({ go }) {
     return [...map.values()]
   }, [ownEvts, taggedEvts])
 
-  const isCurrentMonth = view.year === calRef.year && view.month === calRef.month
+  const isCurrentMonth = view.year === CUR_YEAR && view.month === CUR_MONTH
 
   const monthEvents = useMemo(
     () => evts.filter((e) => e.year === view.year && e.month === view.month),

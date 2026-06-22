@@ -14,8 +14,8 @@ export default function Widgets({ go }) {
   const shortcuts = [
     { key: "rec", label: "Nova gravação", sub: "Gravar e transcrever", cls: "mint", Icon: Mic, onClick: () => go("record") },
     { key: "att", label: "Anexar áudio", sub: "Enviar um arquivo", cls: "coral", Icon: Plus, onClick: () => go("attach") },
-    { key: "rep", label: "Relatórios", sub: "Ver análises", cls: "lilac", Icon: FileText, onClick: () => go("reports") },
-    { key: "cal", label: "Calendário", sub: "Eventos e prazos", cls: "sky", Icon: Calendar, onClick: () => go("calendar") },
+    { key: "rep", label: "Relatórios", sub: "Ver análises", cls: "sky", Icon: FileText, onClick: () => go("reports") },
+    { key: "cal", label: "Calendário", sub: "Eventos e prazos", cls: "lilac", Icon: Calendar, onClick: () => go("calendar") },
   ]
 
   return (

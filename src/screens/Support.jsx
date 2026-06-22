@@ -8,7 +8,7 @@ export default function Support({ go }) {
   const mailto = `mailto:${SUPPORT_EMAIL}?subject=Suporte%20controllerHub&body=Conta:%20${encodeURIComponent(user?.email || "")}%0A%0ADescreva%20sua%20dúvida%20ou%20problema:%0A`
 
   return (
-    <div className="screen">
+    <div className="screen fn-sub-screen">
       <div className="topbar">
         <button className="round-btn" onClick={() => go("widgets")} aria-label="Voltar"><Back size={20} /></button>
         <div className="title center">Suporte</div>

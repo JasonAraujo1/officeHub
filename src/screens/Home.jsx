@@ -4,9 +4,11 @@ import SideMenu from "../components/SideMenu.jsx"
 import NotifBell from "../components/Bell.jsx"
 import { useAuth } from "../auth.jsx"
 import { subscribeReports } from "../lib/reports.js"
-import { events } from "../data.js"
+import { subscribeEvents } from "../lib/events.js"
 
-const TODAY_LABEL = "Jun 19, 2026"
+const _MES_ABBR = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"]
+const _hoje = new Date()
+const TODAY_LABEL = `${_MES_ABBR[_hoje.getMonth()]} ${_hoje.getDate()}, ${_hoje.getFullYear()}`
 
 function MiniBars({ seed = 1, color = "rgba(0,0,0,.6)" }) {
   const base = seed === 1
@@ -28,11 +30,13 @@ export default function Home({ go }) {
   const inicial = nome.charAt(0).toUpperCase()
   const [menu, setMenu] = useState(false)
   const [reportCount, setReportCount] = useState(null)
+  const [eventCount, setEventCount] = useState(null)
 
   useEffect(() => {
-    let unsub
-    try { unsub = subscribeReports((list) => setReportCount(list.length)) } catch (e) {}
-    return () => unsub && unsub()
+    const subs = []
+    try { subs.push(subscribeReports((list) => setReportCount(list.length))) } catch (e) {}
+    try { subs.push(subscribeEvents((list) => setEventCount(list.length))) } catch (e) {}
+    return () => subs.forEach((u) => u && u())
   }, [])
 
   return (
@@ -88,8 +92,8 @@ export default function Home({ go }) {
             <div className="stat-head"><span className="stat-ic"><CalendarSolid size={16} /></span>Calendário</div>
             <MiniBars seed={2} color="#af7dd0" />
             <div className="stat-val">
-              <span className="stat-big">{events.length}</span>
-              <span className="stat-sub">{events.length === 1 ? "Evento" : "Eventos"}</span>
+              <span className="stat-big">{eventCount == null ? "—" : eventCount}</span>
+              <span className="stat-sub">{eventCount === 1 ? "Evento" : "Eventos"}</span>
             </div>
           </button>
         </div>

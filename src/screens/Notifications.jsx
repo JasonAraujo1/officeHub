@@ -17,7 +17,7 @@ export default function Notifications({ go }) {
   }, [])
 
   return (
-    <div className="screen">
+    <div className="screen notif-screen">
       <div className="topbar">
         <button className="round-btn" onClick={() => go("home")} aria-label="Voltar"><Back size={20} /></button>
         <div className="title center">Notificações</div>

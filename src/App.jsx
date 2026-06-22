@@ -27,6 +27,10 @@ const SCREEN_THEME = {
   widgets: "#ffffff",
   record: "#b7ffa9",
   attach: "#b7ffa9",
+  notifications: "#ffe7a3",
+  profile: "#cfe2fe",
+  settings: "#cfe2fe",
+  support: "#cfe2fe",
 }
 function setThemeColor(color) {
   const m = document.querySelector('meta[name="theme-color"]')

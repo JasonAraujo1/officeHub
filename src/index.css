@@ -416,7 +416,8 @@ a { color: inherit; }
    BOTTOM NAV (escura, flutuante)
 =================================================================== */
 .bottom-nav {
-  position: absolute; left: 0; right: 0; bottom: 0;
+  position: fixed; left: 50%; transform: translateX(-50%); bottom: 0;
+  width: 100%; max-width: 480px;
   height: var(--nav-h);
   background: var(--dark);
   border-radius: 28px 28px 0 0;
@@ -974,3 +975,41 @@ html, body { background: #000; }
 
 /* marca evento compartilhado (você foi marcado) */
 .ev-shared { font-size: 11px; font-weight: 700; color: var(--c-purple); flex: 0 0 auto; }
+
+/* ===================================================================
+   SISTEMA DE CORES FUNCIONAIS (6 cores) — Controlaí
+   Cada funcionalidade tem uma cor. Recursos/abas novos herdam a cor da
+   funcionalidade-pai. Aninhamento (aba dentro de aba) clareia por nível.
+   Mapa: ver DESIGN_COLORS.md
+=================================================================== */
+:root {
+  --fn-home:     #b7ffa9; /* Início / dashboard */
+  --fn-record:   #ffd439; /* Gravação / transcrição */
+  --fn-reports:  #ffc7ab; /* Relatórios */
+  --fn-calendar: #ebcefd; /* Calendário / eventos */
+  --fn-tools:    #9fc8fe; /* Funções ("Mais") / widgets */
+  --fn-account:  #ffb5f1; /* Conta / perfil / config / notificações */
+}
+
+/* Define a cor da funcionalidade no contêiner-raiz da área */
+.fn-home     { --fn: var(--fn-home); }
+.fn-record   { --fn: var(--fn-record); }
+.fn-reports  { --fn: var(--fn-reports); }
+.fn-calendar { --fn: var(--fn-calendar); }
+.fn-tools    { --fn: var(--fn-tools); }
+.fn-account  { --fn: var(--fn-account); }
+
+/* Nível de aninhamento: cada nível mais claro que o pai.
+   .fn-l1 = funcionalidade; .fn-l2 = aba dentro dela; .fn-l3 = aba dentro da aba… */
+.fn-l1 { background: var(--fn); }
+.fn-l2 { background: color-mix(in srgb, var(--fn) 84%, #fff); }
+.fn-l3 { background: color-mix(in srgb, var(--fn) 68%, #fff); }
+.fn-l4 { background: color-mix(in srgb, var(--fn) 52%, #fff); }
+
+/* Realce/tinta na cor da funcionalidade (texto e fundos suaves) */
+.fn-ink  { color: var(--fn); }
+.fn-tint { background: color-mix(in srgb, var(--fn) 22%, #fff); }
+
+/* Fundos coloridos por funcionalidade ao entrar na tela */
+.screen.notif-screen { background: #ffe7a3; }   /* Notificações: amarelo */
+.screen.fn-sub-screen { background: #cfe2fe; }   /* Usuário/Config/Suporte: azul claro (sub de Funções) */
