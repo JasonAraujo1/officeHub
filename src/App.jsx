@@ -23,7 +23,7 @@ const SCREEN_THEME = {
   home: "#ffffff",
   reports: "#ffc7ab",
   report: "#ffc7ab",
-  calendar: "#ffffff",
+  calendar: "#c9a6f0",
   widgets: "#ffffff",
   record: "#b7ffa9",
   attach: "#b7ffa9",

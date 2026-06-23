@@ -1050,7 +1050,7 @@ html, body { background: #000; }
 .app-shell { background: transparent; padding-top: env(safe-area-inset-top, 0px); }
 
 /* CALENDÁRIO — fundo roxo, card fosco translúcido, selects de mês/ano */
-.screen.cal-screen { background: #c9a6f0; }
+.screen.has-nav.cal-screen { background: #c9a6f0; }
 .cal-screen .cal-card {
   background: rgba(255, 255, 255, 0.28);
   -webkit-backdrop-filter: blur(14px);
@@ -1068,6 +1068,25 @@ html, body { background: #000; }
 .cal-anim { animation: calslide .26s ease; }
 @keyframes calslide { from { opacity: 0; transform: translateX(12px); } to { opacity: 1; transform: translateX(0); } }
 .cal-card { touch-action: pan-y; }
+
+/* Dropdown customizado (mês/ano) — discreto, arredondado, sem borda, fosco */
+.msel { position: relative; }
+.msel-btn { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,.5); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border: none; border-radius: 14px; padding: 10px 16px; font-size: 15px; font-weight: 700; color: #000; cursor: pointer; }
+.msel-pop { position: absolute; top: calc(100% + 6px); left: 0; z-index: 50; min-width: 160px; max-height: 264px; overflow-y: auto; background: rgba(255,255,255,.94); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); border-radius: 16px; padding: 6px; box-shadow: 0 14px 36px rgba(0,0,0,.18); }
+.msel-pop.right { left: auto; right: 0; }
+.msel-opt { display: block; width: 100%; text-align: left; border: none; background: none; border-radius: 10px; padding: 10px 12px; font-size: 14px; font-weight: 600; color: #000; cursor: pointer; }
+.msel-opt:hover { background: rgba(0,0,0,.06); }
+.msel-opt.active { background: rgba(0,0,0,.12); }
+
+/* Calendário roxo: demais elementos também foscos translúcidos */
+.cal-screen .round-btn,
+.cal-screen .summary-card,
+.cal-screen .mini-card {
+  background: rgba(255,255,255,.3);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,.45);
+  color: #000;
+}
 
 /* Tab trigger sublinhado (padrão único do app — estilo Resumo/Completo/Transcrição) */
 .rpt-tabs { display: flex; gap: 24px; border-bottom: 1px solid rgba(0, 0, 0, 0.12); margin-bottom: 16px; }
@@ -1101,3 +1120,14 @@ html, body { background: #000; }
 .kb-manage { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(0,0,0,.08); }
 .kb-manage select { flex: 1; min-width: 90px; appearance: none; -webkit-appearance: none; background: rgba(0,0,0,.05); border: none; border-radius: 8px; padding: 6px 8px; font-size: 11px; font-weight: 600; color: #111; }
 .kb-del { width: 26px; height: 26px; border-radius: 8px; border: none; background: rgba(192,57,43,.12); color: #c0392b; cursor: pointer; flex: 0 0 auto; }
+
+/* Colunas chevron colapsáveis (framer-motion anima a altura) */
+.kb-col { background: rgba(255,255,255,.28); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,.5); border-radius: 18px; overflow: hidden; }
+.kb-col-head { display: flex; align-items: center; gap: 10px; width: 100%; padding: 14px 16px; border: none; background: transparent; cursor: pointer; color: #000; }
+.kb-dot { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; }
+.kb-col-title { font-size: 15px; font-weight: 800; color: #000; }
+.kb-count { font-size: 12px; font-weight: 700; background: rgba(0,0,0,.12); border-radius: 999px; padding: 1px 8px; color: #000; }
+.kb-cards { display: flex; flex-direction: column; gap: 10px; padding: 0 12px 14px; }
+.kb-card-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; }
+.kb-assignee { font-size: 11px; font-weight: 800; color: #000; background: rgba(0,0,0,.08); border-radius: 999px; padding: 3px 9px; }
+.kb-date { font-size: 11px; color: #666; }
