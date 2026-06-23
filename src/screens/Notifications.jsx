@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { Back, Bell, Check, X } from "../icons.jsx"
 import { subscribeNotifications, markRead, markAllRead, removeNotification } from "../lib/notifications.js"
 import { getReport } from "../lib/reports.js"
+import { enablePush, pushStatus, listenForeground } from "../lib/push.js"
 
 function timeAgo(v) {
   const d = v?.toDate ? v.toDate() : (v?.seconds ? new Date(v.seconds * 1000) : null)
@@ -11,11 +12,28 @@ function timeAgo(v) {
 
 export default function Notifications({ go }) {
   const [list, setList] = useState([])
+  const [pstat, setPstat] = useState("default")
+  const [busy, setBusy] = useState(false)
+
   useEffect(() => {
     let unsub
     try { unsub = subscribeNotifications(setList) } catch (e) { console.error(e) }
     return () => unsub && unsub()
   }, [])
+
+  useEffect(() => {
+    setPstat(pushStatus())
+    let off
+    listenForeground().then((fn) => { off = fn }).catch(() => {})
+    return () => { if (typeof off === "function") off() }
+  }, [])
+
+  async function ativarPush() {
+    setBusy(true)
+    try { await enablePush(); setPstat("granted") }
+    catch (e) { alert(e.message || "Não foi possível ativar as notificações.") }
+    finally { setBusy(false) }
+  }
 
   async function openNotif(n) {
     markRead(n.id)
@@ -35,6 +53,16 @@ export default function Notifications({ go }) {
         <div className="title center">Notificações</div>
         <button className="round-btn" onClick={() => markAllRead(list)} aria-label="Marcar todas como lidas"><Check size={18} /></button>
       </div>
+
+      {pstat === "granted" ? (
+        <div className="push-banner on"><Bell size={15} /> Notificações push ativadas</div>
+      ) : pstat === "unsupported" ? (
+        <div className="push-banner">Push não é suportado neste navegador.</div>
+      ) : (
+        <button className="push-banner btn" onClick={() => go("settings")}>
+          <Bell size={15} /> Notificações desativadas — ativar em Configurações
+        </button>
+      )}
 
       {list.length === 0 ? (
         <div className="empty">

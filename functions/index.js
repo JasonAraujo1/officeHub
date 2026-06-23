@@ -1,8 +1,10 @@
 const { onObjectFinalized } = require("firebase-functions/v2/storage")
+const { onDocumentCreated } = require("firebase-functions/v2/firestore")
 const { defineSecret } = require("firebase-functions/params")
 const { initializeApp } = require("firebase-admin/app")
 const { getFirestore } = require("firebase-admin/firestore")
 const { getStorage } = require("firebase-admin/storage")
+const { getMessaging } = require("firebase-admin/messaging")
 const logger = require("firebase-functions/logger")
 
 initializeApp()
@@ -177,6 +179,37 @@ exports.processAudio = onObjectFinalized(
         { status: "error", error: "Não foi possível gerar o relatório." },
         { merge: true }
       )
+    }
+  }
+)
+
+// Envia notificação push (FCM) quando uma notificação é criada para um usuário.
+exports.sendPush = onDocumentCreated(
+  { region: "us-east1", document: "users/{uid}/notifications/{nid}" },
+  async (event) => {
+    const data = event.data && event.data.data()
+    if (!data) return
+    const uid = event.params.uid
+    const db = getFirestore()
+    const snap = await db.collection(`users/${uid}/pushTokens`).get()
+    const tokens = snap.docs.map((d) => d.id)
+    if (!tokens.length) return
+    try {
+      const res = await getMessaging().sendEachForMulticast({
+        tokens,
+        notification: { title: data.title || "Controlaí", body: data.body || "" },
+        data: {
+          reportId: String(data.reportId || ""),
+          ownerUid: String(data.ownerUid || ""),
+          type: String(data.type || ""),
+        },
+        webpush: { fcmOptions: { link: "/" } },
+      })
+      const dead = []
+      res.responses.forEach((r, i) => { if (!r.success) dead.push(tokens[i]) })
+      await Promise.all(dead.map((t) => db.doc(`users/${uid}/pushTokens/${t}`).delete().catch(() => {})))
+    } catch (e) {
+      logger.error("Falha ao enviar push", e)
     }
   }
 )

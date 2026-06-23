@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react"
-import { Back, Shield, LogOut, UserPlus, Users, Check, X } from "../icons.jsx"
+import { Back, Shield, LogOut, UserPlus, Users, Check, X, Bell } from "../icons.jsx"
 import { useAuth } from "../auth.jsx"
 import { isSuperadmin } from "../lib/roles.js"
+import { enablePush, pushStatus } from "../lib/push.js"
 import {
   subscribeProfile, setController, inviteByEmail,
   subscribeIncoming, acceptInvite, declineInvite, subscribeConnections,
@@ -16,8 +17,10 @@ export default function Settings({ go }) {
   const [email, setEmail] = useState("")
   const [msg, setMsg] = useState(null)
   const [busy, setBusy] = useState(false)
+  const [pstat, setPstat] = useState("default")
 
   useEffect(() => {
+    setPstat(pushStatus())
     const subs = []
     try { subs.push(subscribeProfile(setProfile)) } catch (e) { console.error(e) }
     try { subs.push(subscribeIncoming(setIncoming)) } catch (e) { console.error(e) }
@@ -29,6 +32,11 @@ export default function Settings({ go }) {
 
   async function toggleController() {
     try { await setController(!isController) } catch (e) { console.error(e) }
+  }
+  async function togglePush() {
+    if (pstat === "granted") { alert("Para desativar, use as configurações de notificação do navegador/dispositivo."); return }
+    try { await enablePush(); setPstat("granted") }
+    catch (e) { alert(e.message || "Não foi possível ativar as notificações.") }
   }
   async function invite() {
     setMsg(null); setBusy(true)
@@ -60,6 +68,12 @@ export default function Settings({ go }) {
           <span className="row-label">Sou Controller</span>
           <span className={`switch${isController ? " on" : ""}`} role="switch" aria-checked={isController}
             tabIndex={0} onClick={toggleController}><i /></span>
+        </div>
+        <div className="row-item">
+          <span className="row-ic"><Bell size={18} /></span>
+          <span className="row-label">Notificações push</span>
+          <span className={`switch${pstat === "granted" ? " on" : ""}`} role="switch" aria-checked={pstat === "granted"}
+            tabIndex={0} onClick={togglePush}><i /></span>
         </div>
         <button className="row-item danger" onClick={logout}>
           <span className="row-ic"><LogOut size={18} /></span>

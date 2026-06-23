@@ -1059,6 +1059,19 @@ html, body { background: #000; }
 .settings-screen .switch.on { background: rgba(255, 255, 255, 0.55); }
 .settings-screen .switch i { background: #111; }
 
+/* Banner "Ativar notificações push" */
+.push-banner { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 11px; border-radius: 14px; font-size: 13px; font-weight: 700; margin-bottom: 14px; border: none; cursor: pointer; }
+.notif-screen .push-banner { background: rgba(255,255,255,.5); color: #000; }
+.notif-screen .push-banner.btn {
+  background: rgba(255,255,255,.5);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  color: #7a5e00;
+}
+.push-banner.on { cursor: default; }
+
+/* Configurações: valores também em branco/claro */
+.settings-screen .row-value { color: rgba(255,255,255,.72); }
+
 /* Notificações: tile do sino fosco (não verde) */
 .notif-screen .empty-ic {
   background: rgba(255, 255, 255, 0.5);
