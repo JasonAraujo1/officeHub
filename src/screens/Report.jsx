@@ -32,7 +32,7 @@ export default function Report({ go, item }) {
     try {
       await setReportTags(r, sel, names)
       for (const id of sel) {
-        if (id && id !== user?.uid) notify(id, { title: `Você foi marcado no relatório "${r.title || "Relatório"}"`, type: "report" }).catch(() => {})
+        if (id && id !== user?.uid) notify(id, { title: `Você foi marcado no relatório "${r.title || "Relatório"}"`, type: "report", reportId: r.id, ownerUid: user?.uid }).catch(() => {})
       }
     } catch (e) { console.error(e); alert("Não foi possível salvar a marcação.") }
     setTagOpen(false)

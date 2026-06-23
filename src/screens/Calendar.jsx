@@ -146,7 +146,7 @@ export default function Calendar({ go }) {
   }
 
   return (
-    <div className={`screen has-nav cal-screen${tab === "act" ? " act-dark" : ""}`}>
+    <div className="screen has-nav cal-screen">
       <SideMenu open={menu} onClose={() => setMenu(false)} nome={nome} go={go} logout={logout} active="calendar" />
 
       <div className="topbar">

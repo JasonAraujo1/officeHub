@@ -1,5 +1,5 @@
 import {
-  collection, collectionGroup, doc, setDoc, deleteDoc, updateDoc, arrayUnion, onSnapshot, query, where, orderBy, serverTimestamp,
+  collection, collectionGroup, doc, getDoc, setDoc, deleteDoc, updateDoc, arrayUnion, onSnapshot, query, where, orderBy, serverTimestamp,
 } from "firebase/firestore"
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage"
 import { db, storage, auth } from "../firebase.js"
@@ -46,12 +46,26 @@ export function subscribeReports(cb) {
   return onSnapshot(q, (snap) => cb(snap.docs.map((d) => d.data())))
 }
 
-// Assina os relatórios COMPARTILHADOS com o usuário atual (marcado em taggedUids),
-// estejam eles na pasta de qualquer outro usuário (busca por collectionGroup).
+// Assina os relatórios COMPARTILHADOS comigo. Em vez de um collectionGroup
+// (que exige índice), derivo das notificações de marcação (que já trazem
+// reportId + ownerUid) e busco cada relatório com getReport — leitura direta,
+// permitida pela regra (estou em taggedUids).
 export function subscribeSharedReports(cb) {
   const u = uid()
-  const q = query(collectionGroup(db, "reports"), where("taggedUids", "array-contains", u))
-  return onSnapshot(q, (snap) => cb(snap.docs.map((d) => d.data())))
+  const q = query(collection(db, "users", u, "notifications"))
+  return onSnapshot(q, async (snap) => {
+    const pairs = new Map() // reportId -> ownerUid (dedupe)
+    snap.docs.forEach((d) => {
+      const n = d.data()
+      if (n.type === "report" && n.reportId && n.ownerUid) pairs.set(n.reportId, n.ownerUid)
+    })
+    const results = await Promise.all(
+      [...pairs.entries()].map(async ([rid, owner]) => {
+        try { return await getReport(owner, rid) } catch { return null }
+      })
+    )
+    cb(results.filter((r) => r && r.status))
+  })
 }
 
 // Exclui o relatório (doc) e o áudio do Storage.
@@ -65,6 +79,12 @@ export async function deleteReport(report) {
       console.warn("Áudio já removido ou inacessível:", e)
     }
   }
+}
+
+// Lê um relatório específico (de qualquer dono) — usado ao abrir pela notificação.
+export async function getReport(ownerUid, reportId) {
+  const snap = await getDoc(doc(db, "users", ownerUid, "reports", reportId))
+  return snap.exists() ? snap.data() : null
 }
 
 // Renomeia o título do relatório.

@@ -13,6 +13,7 @@ import Support from "./screens/Support.jsx"
 import Notifications from "./screens/Notifications.jsx"
 import Login from "./screens/Login.jsx"
 import BottomNav from "./components/BottomNav.jsx"
+import PushToasts from "./components/PushToasts.jsx"
 import { AuthProvider, useAuth } from "./auth.jsx"
 import { isConfigured } from "./firebase.js"
 
@@ -90,6 +91,7 @@ function Shell() {
         </motion.div>
       </AnimatePresence>
       {showNav && <BottomNav active={screen} go={go} />}
+      <PushToasts go={go} />
     </div>
   )
 }

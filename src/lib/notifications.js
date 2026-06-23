@@ -9,10 +9,11 @@ function me() {
 }
 
 // Cria uma notificação para outro usuário (ou para si mesmo).
-export async function notify(toUid, { title, body = "", type = "info" }) {
+// reportId/ownerUid permitem abrir o relatório ao clicar na notificação.
+export async function notify(toUid, { title, body = "", type = "info", reportId = null, ownerUid = null }) {
   const id = crypto.randomUUID?.() || String(Date.now() + Math.random())
   await setDoc(doc(db, "users", toUid, "notifications", id), {
-    id, title, body, type, read: false, createdAt: serverTimestamp(),
+    id, title, body, type, reportId, ownerUid, read: false, createdAt: serverTimestamp(),
   })
 }
 

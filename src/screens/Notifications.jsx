@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { Back, Bell, Check, X } from "../icons.jsx"
 import { subscribeNotifications, markRead, markAllRead, removeNotification } from "../lib/notifications.js"
+import { getReport } from "../lib/reports.js"
 
 function timeAgo(v) {
   const d = v?.toDate ? v.toDate() : (v?.seconds ? new Date(v.seconds * 1000) : null)
@@ -15,6 +16,17 @@ export default function Notifications({ go }) {
     try { unsub = subscribeNotifications(setList) } catch (e) { console.error(e) }
     return () => unsub && unsub()
   }, [])
+
+  async function openNotif(n) {
+    markRead(n.id)
+    if (n.type === "report" && n.reportId && n.ownerUid) {
+      try {
+        const data = await getReport(n.ownerUid, n.reportId)
+        if (data) go("report", data)
+        else alert("Relatório não encontrado ou sem acesso.")
+      } catch (e) { console.error(e) }
+    }
+  }
 
   return (
     <div className="screen notif-screen">
@@ -33,7 +45,7 @@ export default function Notifications({ go }) {
       ) : (
         <div className="notif-list">
           {list.map((n) => (
-            <div className={`notif${n.read ? "" : " unread"}`} key={n.id} onClick={() => markRead(n.id)}>
+            <div className={`notif${n.read ? "" : " unread"}`} key={n.id} onClick={() => openNotif(n)} style={{ cursor: "pointer" }}>
               {!n.read && <span className="notif-dot" />}
               <span className="notif-info">
                 <span className="notif-title">{n.title}</span>
