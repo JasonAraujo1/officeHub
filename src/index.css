@@ -1141,6 +1141,17 @@ button:active, .recent-card:active, .row-item:active, .stat-card:active,
 .msel-opt.active { background: rgba(0,0,0,.12); }
 
 
+/* Aba Atividades (Kanban) com fundo preto como a Home; texto branco onde contrasta */
+.cal-screen.act-dark { background: #111111; }
+.act-dark .title,
+.act-dark .kb-head-title { color: #fff; }
+.act-dark .round-btn { background: rgba(255,255,255,.12); color: #fff; }
+.act-dark .kb-add-btn { background: rgba(255,255,255,.16); color: #fff; }
+.act-dark .rpt-tabs { border-bottom-color: rgba(255,255,255,.18); }
+.act-dark .rpt-tabs button { color: rgba(255,255,255,.55); }
+.act-dark .rpt-tabs button.active { color: #fff; }
+.act-dark .rpt-tabs button.active::after { background: #fff; }
+
 /* Tab trigger sublinhado (padrão único do app — estilo Resumo/Completo/Transcrição) */
 .rpt-tabs { display: flex; gap: 24px; border-bottom: 1px solid rgba(0, 0, 0, 0.12); margin-bottom: 16px; }
 .rpt-tabs button { padding: 0 0 10px; border: none; background: none; border-radius: 0; font-size: 14px; font-weight: 600; color: rgba(0, 0, 0, 0.45); position: relative; cursor: pointer; }
