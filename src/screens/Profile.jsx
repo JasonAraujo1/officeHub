@@ -9,7 +9,7 @@ export default function Profile({ go }) {
   const admin = isSuperadmin(user)
 
   return (
-    <div className="screen fn-sub-screen">
+    <div className="screen fn-sub-screen profile-screen">
       <div className="topbar">
         <button className="round-btn" onClick={() => go("widgets")} aria-label="Voltar"><Back size={20} /></button>
         <div className="title center">Perfil</div>

@@ -28,8 +28,8 @@ const SCREEN_THEME = {
   record: "#b7ffa9",
   attach: "#b7ffa9",
   notifications: "#ffe7a3",
-  profile: "#cfe2fe",
-  settings: "#cfe2fe",
+  profile: "#b7ffa9",
+  settings: "#111111",
   support: "#cfe2fe",
 }
 function setThemeColor(color) {
