@@ -16,7 +16,7 @@ export default function Support({ go }) {
       </div>
 
       <div className="profile-head" style={{ paddingTop: 18 }}>
-        <div className="profile-avatar" style={{ background: "var(--c-purple)", color: "#fff" }}><Help size={34} /></div>
+        <div className="profile-avatar" style={{ background: "#8fb6f0", color: "#0a335f" }}><Help size={34} /></div>
         <div className="profile-name">Como podemos ajudar?</div>
         <div className="profile-email">Fale com a gente ou tire suas dúvidas.</div>
       </div>

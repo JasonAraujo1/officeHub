@@ -7,7 +7,6 @@ import { subscribeEvents, subscribeTaggedEvents, createEvent, deleteEvent } from
 import { subscribeConnections } from "../lib/team.js"
 import { notify } from "../lib/notifications.js"
 import Kanban from "../components/Kanban.jsx"
-import Select from "../components/Select.jsx"
 
 const WEEKDAYS = ["seg", "ter", "qua", "qui", "sex", "sab", "dom"]
 const MONTHS = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"]
@@ -167,12 +166,12 @@ export default function Calendar({ go }) {
       <>
       {/* navegação de meses (minimalista) */}
       <div className="cal-nav cal-select">
-        <Select ariaLabel="Mês" value={view.month}
-          options={MONTHS_FULL.map((m, i) => ({ value: i, label: m }))}
-          onChange={(v) => setView((s) => ({ ...s, month: v }))} />
-        <Select ariaLabel="Ano" value={view.year}
-          options={YEARS.map((y) => ({ value: y, label: String(y) }))}
-          onChange={(v) => setView((s) => ({ ...s, year: v }))} />
+        <select value={view.month} onChange={(e) => setView((v) => ({ ...v, month: Number(e.target.value) }))} aria-label="Mês">
+          {MONTHS_FULL.map((m, i) => <option key={i} value={i}>{m}</option>)}
+        </select>
+        <select value={view.year} onChange={(e) => setView((v) => ({ ...v, year: Number(e.target.value) }))} aria-label="Ano">
+          {YEARS.map((y) => <option key={y} value={y}>{y}</option>)}
+        </select>
       </div>
 
       {/* grade do calendário */}

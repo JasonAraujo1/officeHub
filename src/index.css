@@ -1063,22 +1063,64 @@ html, body { background: #000; }
   color: #000;
 }
 
+/* Superfícies translúcidas (fosco) — substituem o branco sólido nessas telas.
+   Sobrescreve os tokens, então TODO elemento (.list-card, .card, .meta, etc.) herda. */
+.notif-screen, .profile-screen, .support-screen {
+  --surface: rgba(255,255,255,.42);
+  --surface-2: rgba(255,255,255,.30);
+  --card: rgba(255,255,255,.42);
+  --card-2: rgba(255,255,255,.30);
+}
+.settings-screen {
+  --surface: rgba(255,255,255,.12);
+  --surface-2: rgba(255,255,255,.08);
+  --card: rgba(255,255,255,.12);
+  --card-2: rgba(255,255,255,.08);
+}
+/* efeito de vidro nos cards principais dessas telas */
+.notif-screen .list-card, .notif-screen .card,
+.fn-sub-screen .list-card, .fn-sub-screen .card, .fn-sub-screen .meta {
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+}
+
+/* Perfil: avatar (J) fosco translúcido, badge preto, "Sair" vermelho pastel */
+.profile-screen .profile-avatar {
+  background: rgba(255,255,255,.42); color: #000;
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,.5);
+}
+.profile-screen .role-badge { color: #000; }
+.profile-screen .row-item.danger,
+.profile-screen .row-item.danger .row-label { color: #e08a8a; }
+
+/* Configurações: "Sair da conta" em vermelho pastel (demais letras já brancas) */
+.settings-screen .row-item.danger,
+.settings-screen .row-item.danger .row-label { color: #e89a9a; }
+
+/* ===================================================================
+   MOVIMENTO — feedback de toque fluido + acessibilidade
+=================================================================== */
+button, .recent-card, .row-item, .stat-card, .mini-card,
+.action-btn, .pill, .tag, .kb-card, .kb-col-head, .big-record {
+  transition: transform .12s ease, opacity .15s ease;
+}
+button:active, .recent-card:active, .row-item:active, .stat-card:active,
+.mini-card:active, .action-btn:active, .pill:active, .tag:active,
+.kb-card:active, .kb-col-head:active {
+  transform: scale(.97);
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+}
+
 /* Safe areas (notch / barra inferior) como extensão do fundo da tela.
    O body recebe a cor da tela via JS; o shell fica transparente e reserva o topo. */
 .app-shell { background: transparent; padding-top: env(safe-area-inset-top, 0px); }
 
-/* CALENDÁRIO — fundo roxo, card fosco translúcido, selects de mês/ano */
-.screen.has-nav.cal-screen { background: #c9a6f0; }
-.cal-screen .cal-card {
-  background: rgba(255, 255, 255, 0.28);
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.55);
-  border-radius: 24px;
-}
+/* CALENDÁRIO — fundo branco (padrão), selects de mês/ano nativos */
 .cal-select select {
   appearance: none; -webkit-appearance: none;
-  background: rgba(255, 255, 255, 0.5); border: none; border-radius: 14px;
+  background: var(--surface-2); border: none; border-radius: 14px;
   padding: 10px 18px; font-size: 15px; font-weight: 700; color: var(--ink);
   cursor: pointer; text-align: center;
 }
@@ -1098,15 +1140,6 @@ html, body { background: #000; }
 .msel-opt:hover { background: rgba(0,0,0,.06); }
 .msel-opt.active { background: rgba(0,0,0,.12); }
 
-/* Calendário roxo: demais elementos também foscos translúcidos */
-.cal-screen .round-btn,
-.cal-screen .summary-card,
-.cal-screen .mini-card {
-  background: rgba(255,255,255,.3);
-  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,.45);
-  color: #000;
-}
 
 /* Tab trigger sublinhado (padrão único do app — estilo Resumo/Completo/Transcrição) */
 .rpt-tabs { display: flex; gap: 24px; border-bottom: 1px solid rgba(0, 0, 0, 0.12); margin-bottom: 16px; }

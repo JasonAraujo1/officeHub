@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import Home from "./screens/Home.jsx"
 import Reports from "./screens/Reports.jsx"
 import Report from "./screens/Report.jsx"
@@ -23,7 +24,7 @@ const SCREEN_THEME = {
   home: "#ffffff",
   reports: "#ffc7ab",
   report: "#ffc7ab",
-  calendar: "#c9a6f0",
+  calendar: "#ffffff",
   widgets: "#ffffff",
   record: "#b7ffa9",
   attach: "#b7ffa9",
@@ -76,7 +77,18 @@ function Shell() {
   const showNav = NAV_TABS.includes(screen)
   return (
     <div className="app-shell">
-      <Current go={go} item={payload} />
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={screen}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+          style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}
+        >
+          <Current go={go} item={payload} />
+        </motion.div>
+      </AnimatePresence>
       {showNav && <BottomNav active={screen} go={go} />}
     </div>
   )

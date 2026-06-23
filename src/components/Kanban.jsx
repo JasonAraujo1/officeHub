@@ -4,11 +4,13 @@ import { useAuth } from "../auth.jsx"
 import { isSuperadmin } from "../lib/roles.js"
 import { subscribeConnections } from "../lib/team.js"
 import { subscribeTasks, createTask, updateTaskStatus, assignTask, deleteTask } from "../lib/tasks.js"
+import { textOn, FN_COLORS } from "../lib/colors.js"
 
+// Pares claro/escuro das 6 cores (DESIGN_COLORS.md) — usamos 3 para os status:
 const COLUMNS = [
-  { key: "todo", label: "A fazer", color: "#b48fe0" },
-  { key: "doing", label: "Fazendo", color: "#6aa6f5" },
-  { key: "done", label: "Feito", color: "#5fc27e" },
+  { key: "todo", label: "A fazer", ...FN_COLORS.calendar },  // lilás
+  { key: "doing", label: "Fazendo", ...FN_COLORS.tools },    // azul
+  { key: "done", label: "Feito", ...FN_COLORS.home },        // verde
 ]
 
 function fmtDate(v) {
@@ -101,27 +103,30 @@ export default function Kanban() {
         const items = byStatus(col.key)
         const ppl = peopleOf(items)
         const isOpen = open[col.key]
+        const headText = textOn(col.light)
+        const aiBg = col.dark
+        const aiText = textOn(aiBg)
         return (
-          <div className="kb-col" key={col.key} style={{ background: col.color }}>
+          <div className="kb-col" key={col.key} style={{ background: col.light, color: headText }}>
             <button className="kb-col-head" onClick={() => setOpen((o) => ({ ...o, [col.key]: !o[col.key] }))}>
               <div className="kb-col-headl">
-                <span className="kb-col-title">{col.label}</span>
-                <span className="kb-col-meta">{items.length} {items.length === 1 ? "tarefa" : "tarefas"} · {ppl.length} {ppl.length === 1 ? "pessoa" : "pessoas"}</span>
+                <span className="kb-col-title" style={{ color: headText }}>{col.label}</span>
+                <span className="kb-col-meta" style={{ color: headText, opacity: 0.8 }}>{items.length} {items.length === 1 ? "tarefa" : "tarefas"} · {ppl.length} {ppl.length === 1 ? "pessoa" : "pessoas"}</span>
               </div>
               <div className="kb-avatars">
                 {ppl.slice(0, 4).map((n) => <span className="kb-av" key={n} title={n}>{initials(n)}</span>)}
                 {ppl.length > 4 && <span className="kb-av more">+{ppl.length - 4}</span>}
               </div>
               <motion.svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-                strokeLinecap="round" strokeLinejoin="round" animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
+                strokeLinecap="round" strokeLinejoin="round" style={{ color: headText }} animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
                 <path d="M6 9l6 6 6-6" />
               </motion.svg>
             </button>
 
             {/* faixa de resumo de IA — cor do card, porém mais escura */}
-            <div className="kb-ai" style={{ background: `color-mix(in srgb, ${col.color} 62%, #000)` }}>
-              <span className="kb-ai-label">Resumo IA</span>
-              <p className="kb-ai-text">{aiSummary(items)}</p>
+            <div className="kb-ai" style={{ background: aiBg, color: aiText }}>
+              <span className="kb-ai-label" style={{ color: aiText }}>Resumo IA</span>
+              <p className="kb-ai-text" style={{ color: aiText }}>{aiSummary(items)}</p>
               {ppl.length > 0 && (
                 <div className="kb-avatars sm">
                   {ppl.slice(0, 5).map((n) => <span className="kb-av light" key={n} title={n}>{initials(n)}</span>)}

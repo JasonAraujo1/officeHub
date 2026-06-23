@@ -57,3 +57,29 @@ Utilitários extras:
 4. Não invente cor nova: derive sempre da cor da funcionalidade-pai.
 
 Os tokens vivem em `src/index.css` (bloco "SISTEMA DE CORES FUNCIONAIS").
+
+## Padrão de contraste de aba — `src/lib/colors.js`
+
+Mantém a legibilidade de qualquer aba/elemento colorido automaticamente:
+
+- **`textOn(cor)`** → cor da **letra e do ícone**: `#000` se o fundo é claro, `#fff` se é escuro (luminância perceptual).
+- **`darken(cor, amt)`** → versão mais escura da cor (ex.: faixa de "Resumo IA" no Kanban).
+- **`frost(cor, alpha)`** → fundo **translúcido fosco** coerente com a aba.
+
+Regras do padrão:
+1. Use sempre **uma das 6 cores** funcionais como base da aba.
+2. Letra e **ícones** na cor retornada por `textOn(base)` (ícone = cor da letra).
+3. Elementos internos com **fundo translúcido fosco** (não cor sólida).
+4. Sub-bloco mais escuro (ex.: faixa de resumo) usa `darken(base)` e recalcula o texto com `textOn(darken(base))`.
+
+Exemplo (aplicado no Kanban):
+
+```jsx
+import { textOn, darken } from "../lib/colors.js"
+const text = textOn(col.color)
+const aiBg = darken(col.color, 0.42)
+<div style={{ background: col.color, color: text }}>
+  <Chevron style={{ color: text }} />
+  <div style={{ background: aiBg, color: textOn(aiBg) }}>Resumo…</div>
+</div>
+```
