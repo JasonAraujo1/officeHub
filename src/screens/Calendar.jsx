@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react"
+import { useState, useMemo, useEffect, useRef } from "react"
 import { Back, Menu, Plus, ChevronLeft, ChevronRight, Check, X } from "../icons.jsx"
 import SideMenu from "../components/SideMenu.jsx"
 import { useAuth } from "../auth.jsx"
@@ -138,6 +138,13 @@ export default function Calendar({ go }) {
     setModal(null)
   }
 
+  const touchX = useRef(0)
+  const onTouchStart = (e) => { touchX.current = e.touches[0].clientX }
+  const onTouchEnd = (e) => {
+    const dx = e.changedTouches[0].clientX - touchX.current
+    if (Math.abs(dx) > 50) shiftMonth(dx < 0 ? 1 : -1)
+  }
+
   return (
     <div className="screen has-nav cal-screen">
       <SideMenu open={menu} onClose={() => setMenu(false)} nome={nome} go={go} logout={logout} active="calendar" />
@@ -168,9 +175,9 @@ export default function Calendar({ go }) {
       </div>
 
       {/* grade do calendário */}
-      <div className="cal-card">
+      <div className="cal-card" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
         <div className="cal-weekdays">{WEEKDAYS.map((w) => <span key={w}>{w}</span>)}</div>
-        <div className="cal-grid">
+        <div className="cal-grid cal-anim" key={`${view.year}-${view.month}`}>
           {cells.map((day, i) => {
             if (day == null) return <div key={`e${i}`} className="cal-day muted" />
             const dayEvents = byDay[day] || []
