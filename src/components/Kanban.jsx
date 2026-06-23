@@ -95,7 +95,7 @@ export default function Kanban() {
         {STATUS.map((s) => (
           <button key={s.key}
             className={`kb-tab${selTab === s.key ? " active" : ""}`}
-            style={selTab === s.key ? { background: s.color, color: "#000" } : null}
+            style={selTab === s.key ? { borderBottomColor: s.color, color: "#000" } : null}
             onClick={() => setSelTab(s.key)}>
             {s.label} <span className="kb-tabcount">{byStatus(s.key).length}</span>
           </button>

@@ -1069,13 +1069,14 @@ html, body { background: #000; }
 @keyframes calslide { from { opacity: 0; transform: translateX(12px); } to { opacity: 1; transform: translateX(0); } }
 .cal-card { touch-action: pan-y; }
 
-/* Tab trigger minimalista (Meus relatórios / @ marcados) */
-.rpt-tabs { display: inline-flex; gap: 4px; background: rgba(0, 0, 0, 0.07); border-radius: 999px; padding: 4px; margin-bottom: 14px; }
-.rpt-tabs button { padding: 8px 16px; border: none; background: transparent; border-radius: 999px; font-size: 13px; font-weight: 600; color: rgba(0, 0, 0, 0.55); cursor: pointer; }
-.rpt-tabs button.active { background: #fff; color: #000; }
+/* Tab trigger sublinhado (padrão único do app — estilo Resumo/Completo/Transcrição) */
+.rpt-tabs { display: flex; gap: 24px; border-bottom: 1px solid rgba(0, 0, 0, 0.12); margin-bottom: 16px; }
+.rpt-tabs button { padding: 0 0 10px; border: none; background: none; border-radius: 0; font-size: 14px; font-weight: 600; color: rgba(0, 0, 0, 0.45); position: relative; cursor: pointer; }
+.rpt-tabs button.active { color: #000; }
+.rpt-tabs button.active::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2.5px; border-radius: 2px; background: #000; }
 
 /* KANBAN — Atividades (abas A fazer/Fazendo/Feito + grade de cards) */
-.cal-tabs { display: inline-flex; margin-bottom: 14px; }
+.cal-tabs { display: flex; }
 .kanban { display: flex; flex-direction: column; gap: 12px; }
 .kb-head { display: flex; align-items: center; justify-content: space-between; }
 .kb-head-title { font-size: 16px; font-weight: 800; color: var(--ink); }
@@ -1083,8 +1084,9 @@ html, body { background: #000; }
 .kb-form { display: flex; flex-direction: column; gap: 10px; background: rgba(255,255,255,.4); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-radius: 18px; padding: 14px; }
 .kb-check { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #000; }
 .kb-check.sm { font-size: 12px; }
-.kb-tabs { display: flex; gap: 8px; }
-.kb-tab { flex: 1; padding: 9px 8px; border: none; border-radius: 12px; background: rgba(255,255,255,.4); font-size: 12.5px; font-weight: 700; color: #000; cursor: pointer; }
+.kb-tabs { display: flex; gap: 22px; border-bottom: 1px solid rgba(0,0,0,.12); margin-bottom: 4px; }
+.kb-tab { padding: 0 0 9px; border: none; border-bottom: 2.5px solid transparent; background: none; border-radius: 0; font-size: 13px; font-weight: 600; color: rgba(0,0,0,.45); cursor: pointer; }
+.kb-tab.active { color: #000; font-weight: 700; }
 .kb-tabcount { font-size: 11px; opacity: .7; }
 .kb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .kb-empty { font-size: 13px; color: rgba(0,0,0,.5); padding: 6px 2px; }
