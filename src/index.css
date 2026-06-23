@@ -1144,6 +1144,14 @@ button:active, .recent-card:active, .row-item:active, .stat-card:active,
 .cal-anim { animation: calslide .26s ease; }
 @keyframes calslide { from { opacity: 0; transform: translateX(12px); } to { opacity: 1; transform: translateX(0); } }
 .cal-card { touch-action: pan-y; }
+
+/* botão "+" preto dentro do widget "Eventos de [mês]" */
+.sc-add { position: absolute; right: 8px; top: 8px; bottom: 8px; width: 120px; border: none; border-radius: 16px; background: #000; color: #fff; display: grid; place-items: center; cursor: pointer; }
+.sc-add:active { transform: scale(.97); }
+.stat-evt { display: flex; gap: 10px; align-items: stretch; }
+.stat-evt .stat-card { flex: 1; }
+.evt-add { flex: 0 0 64px; border: none; border-radius: var(--r-lg); background: #000; color: #fff; display: grid; place-items: center; cursor: pointer; }
+.evt-add:active { transform: scale(.96); }
 /* margens laterais menores (como na Home) */
 .screen.cal-screen { padding-left: 12px; padding-right: 12px; }
 

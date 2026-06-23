@@ -21,8 +21,9 @@ const YEARS = Array.from({ length: 11 }, (_, i) => CUR_YEAR - 5 + i)
 const typeInfo = {
   ...eventCategories,
   tarefa: { label: "Tarefas", plural: "Tarefas", sub: "A fazer", color: "#c9a4ea" },
+  lembrete: { label: "Lembrete", plural: "Lembretes", sub: "Lembrete", color: "#ffb84d" },
 }
-const ADD_TYPES = ["tarefa", "reuniao", "vencimento", "feriado"]
+const ADD_TYPES = ["tarefa", "lembrete", "reuniao", "vencimento", "feriado"]
 
 export default function Calendar({ go }) {
   const { user, logout } = useAuth()
@@ -112,7 +113,8 @@ export default function Calendar({ go }) {
   async function saveAdd() {
     if (!add.title.trim()) return
     const taggedUids = add.tagged || []
-    const taggedNames = connections.filter((c) => taggedUids.includes(c.uid)).map((c) => c.name)
+    const allPeople = [{ uid: myUid, name: "Eu mesmo" }, ...connections]
+    const taggedNames = allPeople.filter((c) => taggedUids.includes(c.uid)).map((c) => c.name)
     const title = add.title.trim()
     try {
       await createEvent({
@@ -121,12 +123,9 @@ export default function Calendar({ go }) {
         time: add.time.trim() || "—",
         taggedUids, taggedNames,
       })
+      const corpo = `${Number(add.day) || 1}/${view.month + 1} · ${add.time.trim() || "—"} · ${typeInfo[add.type].label}`
       for (const uid of taggedUids) {
-        notify(uid, {
-          title: `Você foi marcado em "${title}"`,
-          body: `${Number(add.day) || 1}/${view.month + 1} · ${add.time.trim() || "—"} · ${typeInfo[add.type].label}`,
-          type: "event",
-        }).catch(() => {})
+        notify(uid, { title: `Você foi marcado em "${title}"`, body: corpo, type: "event" }).catch(() => {})
       }
     } catch (e) { console.error(e); alert("Não foi possível salvar a tarefa.") }
     setAdd(null)
@@ -195,12 +194,13 @@ export default function Calendar({ go }) {
         </div>
       </div>
 
-      {/* resumo do mês */}
-      <button className="summary-card" onClick={openAll} style={{ width: "100%" }}>
+      {/* resumo do mês com botão "+" dentro do widget */}
+      <div className="summary-card" onClick={openAll} style={{ position: "relative", cursor: "pointer", width: "100%" }}>
         <div className="sc-label">Eventos de {MONTHS_FULL[view.month]}</div>
         <div className="sc-big">{monthEvents.length} Eventos</div>
         <div className="sc-sub">Clique para ver todos</div>
-      </button>
+        <button className="sc-add" onClick={(e) => { e.stopPropagation(); openAdd(null) }} aria-label="Adicionar evento"><Plus size={48} stroke={1.2} /></button>
+      </div>
 
       {/* mini cards por categoria — clicar adiciona uma tarefa dessa categoria */}
       <div className="mini-grid">
@@ -242,9 +242,14 @@ export default function Calendar({ go }) {
                 </div>
               ))
             )}
-            <button className="pill block" style={{ marginTop: 16 }} onClick={() => openAdd(modal.day)}>
-              <Plus size={18} /> Adicionar tarefa{modal.day ? ` no dia ${modal.day}` : ""}
-            </button>
+            <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
+              <button className="pill block" style={{ flex: 1, borderRadius: 16 }} onClick={() => openAdd(modal.day, "tarefa")}>
+                <Plus size={18} /> Tarefa
+              </button>
+              <button className="pill block" style={{ flex: 1, borderRadius: 16, background: "#ffb84d", color: "#000" }} onClick={() => openAdd(modal.day, "lembrete")}>
+                <Plus size={18} /> Lembrete
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -254,7 +259,7 @@ export default function Calendar({ go }) {
         <div className="modal-overlay" onClick={() => setAdd(null)}>
           <div className="modal-sheet" onClick={(e) => e.stopPropagation()}>
             <div className="modal-grip" />
-            <div className="modal-title">Nova tarefa</div>
+            <div className="modal-title">{add.type === "lembrete" ? "Novo lembrete" : "Nova atividade"}</div>
             <div className="modal-sub">{MONTHS_FULL[view.month]} {view.year}</div>
 
             <div className="type-chips">
@@ -291,18 +296,16 @@ export default function Calendar({ go }) {
               </label>
             </div>
 
-            {connections.length > 0 && (
-              <div style={{ marginTop: 14 }}>
-                <span className="field" style={{ display: "block" }}><span style={{ fontSize: 13, fontWeight: 700, color: "var(--ink-2)" }}>Marcar usuários</span></span>
-                <div className="type-chips" style={{ marginTop: 8 }}>
-                  {connections.map((c) => (
-                    <button key={c.uid} className={`type-chip${add.tagged.includes(c.uid) ? " active" : ""}`} onClick={() => toggleTag(c.uid)}>
-                      @{c.name}
-                    </button>
-                  ))}
-                </div>
+            <div style={{ marginTop: 14 }}>
+              <span className="field" style={{ display: "block" }}><span style={{ fontSize: 13, fontWeight: 700, color: "var(--ink-2)" }}>Marcar usuários</span></span>
+              <div className="type-chips" style={{ marginTop: 8 }}>
+                {[{ uid: myUid, name: "Eu mesmo" }, ...connections].map((c) => (
+                  <button key={c.uid} className={`type-chip${add.tagged.includes(c.uid) ? " active" : ""}`} onClick={() => toggleTag(c.uid)}>
+                    @{c.name}
+                  </button>
+                ))}
               </div>
-            )}
+            </div>
 
             <div style={{ display: "flex", gap: 10, marginTop: 18 }}>
               <button className="pill ghost" style={{ flex: 1, borderRadius: 16 }} onClick={() => setAdd(null)}><X size={18} /> Cancelar</button>

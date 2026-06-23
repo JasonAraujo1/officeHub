@@ -15,6 +15,7 @@ export default function Settings({ go }) {
   const [incoming, setIncoming] = useState([])
   const [connections, setConnections] = useState([])
   const [email, setEmail] = useState("")
+  const [role, setRole] = useState("")
   const [msg, setMsg] = useState(null)
   const [busy, setBusy] = useState(false)
   const [pstat, setPstat] = useState("default")
@@ -41,9 +42,9 @@ export default function Settings({ go }) {
   async function invite() {
     setMsg(null); setBusy(true)
     try {
-      const t = await inviteByEmail(email)
-      setMsg({ ok: true, text: `Solicitação enviada para ${t.name}.` })
-      setEmail("")
+      const t = await inviteByEmail(email, role)
+      setMsg({ ok: true, text: `Convite enviado para ${t.name}${role.trim() ? ` (${role.trim()})` : ""}.` })
+      setEmail(""); setRole("")
     } catch (e) {
       setMsg({ ok: false, text: e.message || "Erro ao enviar a solicitação." })
     } finally { setBusy(false) }
@@ -86,7 +87,9 @@ export default function Settings({ go }) {
         <>
           <div className="settings-section">Equipe</div>
           <div className="list-card" style={{ padding: 16 }}>
-            <div className="row-label" style={{ marginBottom: 10 }}>Adicionar usuário pelo e-mail</div>
+            <div className="row-label" style={{ marginBottom: 10 }}>Adicionar usuário e designar função</div>
+            <input className="rec-title-input" value={role} onChange={(e) => setRole(e.target.value)}
+              placeholder="Função (ex.: Editor, Analista)" style={{ marginBottom: 8, width: "100%" }} />
             <div className="invite-row">
               <input className="rec-title-input" value={email} onChange={(e) => setEmail(e.target.value)}
                 type="email" placeholder="email@exemplo.com" />
@@ -107,7 +110,7 @@ export default function Settings({ go }) {
             {incoming.map((inv) => (
               <div className="row-item" key={inv.id}>
                 <span className="row-ic"><UserPlus size={18} /></span>
-                <span className="row-label">{inv.fromName}<br /><span className="row-label sub">{inv.fromEmail}</span></span>
+                <span className="row-label">{inv.fromName} te convidou<br /><span className="row-label sub">{inv.role ? `Função: ${inv.role}` : inv.fromEmail}</span></span>
                 <button className="req-btn ok" onClick={() => acceptInvite(inv)} aria-label="Aceitar"><Check size={16} /></button>
                 <button className="req-btn no" onClick={() => declineInvite(inv)} aria-label="Recusar"><X size={16} /></button>
               </div>

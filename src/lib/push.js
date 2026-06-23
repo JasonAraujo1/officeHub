@@ -1,6 +1,7 @@
 import { getMessaging, getToken, onMessage, isSupported } from "firebase/messaging"
 import { doc, setDoc, serverTimestamp } from "firebase/firestore"
 import { db, auth } from "../firebase.js"
+import { notify } from "./notifications.js"
 
 let _msg = null
 async function getMsg() {
@@ -31,6 +32,16 @@ export async function enablePush() {
   await setDoc(doc(db, "users", u.uid, "pushTokens", token), {
     token, createdAt: serverTimestamp(), ua: navigator.userAgent.slice(0, 180),
   })
+
+  // notificação de boas-vindas — demonstra como serão os avisos (vira push real)
+  try {
+    await notify(u.uid, {
+      title: "Notificações ativadas ✅",
+      body: "Você receberá avisos como este quando for marcado.",
+      type: "info",
+    })
+  } catch (e) { /* não bloqueia a ativação */ }
+
   return token
 }
 
