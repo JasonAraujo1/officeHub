@@ -69,14 +69,6 @@ export default function Settings({ go }) {
         </button>
       </div>
 
-      <div className="settings-section">Relatórios</div>
-      <div className="list-card">
-        <button className="row-item" onClick={() => go("reportmodel")}>
-          <span className="row-ic"><FileText size={18} /></span>
-          <span className="row-label">Modelo do relatório<br /><span className="row-label sub">Defina como formatar a análise do áudio</span></span>
-        </button>
-      </div>
-
       {admin && (
         <>
           <div className="settings-section">Administração</div>

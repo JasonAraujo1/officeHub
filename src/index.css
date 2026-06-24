@@ -887,7 +887,7 @@ html, body { background: #000; }
 =================================================================== */
 .user-widget {
   width: 100%; display: flex; align-items: center; gap: 14px;
-  background: var(--surface-2); border-radius: var(--r-lg); padding: 16px;
+  background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.06); border-radius: var(--r-lg); padding: 16px;
   text-align: left; margin: 6px 0 10px;
 }
 .user-widget-avatar { width: 52px; height: 52px; border-radius: 50%; background: var(--mint); color: #000; display: grid; place-items: center; font-weight: 800; font-size: 20px; flex: 0 0 auto; }
@@ -901,7 +901,7 @@ html, body { background: #000; }
 .config-widget {
   width: 100%; display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto;
   column-gap: 14px; align-items: center;
-  background: var(--surface-2); border-radius: var(--r-lg); padding: 16px; text-align: left; margin-bottom: 10px;
+  background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.06); border-radius: var(--r-lg); padding: 16px; text-align: left; margin-bottom: 10px;
 }
 .config-widget .config-ic { grid-row: 1 / 3; width: 46px; height: 46px; border-radius: 14px; background: var(--dark); color: #fff; display: grid; place-items: center; }
 .config-widget .config-label { font-size: 16px; font-weight: 800; color: var(--ink); align-self: end; }
@@ -1081,7 +1081,7 @@ html, body { background: #000; }
 
 /* Superfícies translúcidas (fosco) — substituem o branco sólido nessas telas.
    Sobrescreve os tokens, então TODO elemento (.list-card, .card, .meta, etc.) herda. */
-.notif-screen, .profile-screen, .support-screen, .notes-screen, .team-screen, .dash-screen, .reportmodel-screen {
+.notif-screen, .profile-screen, .support-screen, .notes-screen, .team-screen, .dash-screen, .reportmodel-screen, .ai-screen {
   --surface: rgba(255,255,255,.42);
   --surface-2: rgba(255,255,255,.30);
   --card: rgba(255,255,255,.42);
@@ -1309,3 +1309,59 @@ button:active, .recent-card:active, .row-item:active, .stat-card:active,
 .dash-bar-n { font-size: 11px; font-weight: 800; color: rgba(0,0,0,.65); }
 .dash-bar-fill { width: 100%; max-width: 26px; min-height: 3px; border-radius: 6px 6px 3px 3px; transition: height .3s ease; }
 .dash-bar-l { font-size: 10.5px; font-weight: 600; color: rgba(0,0,0,.55); white-space: nowrap; }
+
+/* ===================================================================
+   IA DO CONTROLAÍ — widget, questionário e chat
+=================================================================== */
+/* widget em Funções */
+.ai-widget {
+  display: flex; align-items: center; gap: 12px; width: 100%;
+  background: var(--surface, rgba(255,255,255,.5)); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  border: none; border-radius: 18px; padding: 12px 14px; margin-bottom: 12px; cursor: pointer; text-align: left;
+}
+.ai-widget-img { width: 46px; height: 46px; border-radius: 12px; object-fit: cover; flex: 0 0 auto; }
+.ai-widget-txt { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.ai-widget-title { font-size: 15px; font-weight: 800; color: #000; }
+.ai-widget-sub { font-size: 12px; color: rgba(0,0,0,.6); }
+.ai-widget-go { font-size: 12px; font-weight: 800; color: #fff; background: #111; border-radius: 999px; padding: 6px 14px; flex: 0 0 auto; }
+
+/* intro do questionário */
+.ai-intro { text-align: center; padding: 8px 8px 4px; }
+.ai-hero-img { width: 96px; height: 96px; object-fit: contain; }
+.ai-intro-title { font-size: 18px; font-weight: 800; color: #000; margin-top: 6px; }
+.ai-intro-sub { font-size: 13.5px; color: rgba(0,0,0,.65); margin: 6px auto 4px; max-width: 320px; line-height: 1.45; }
+
+/* perguntas */
+.ai-q { margin: 14px 2px; }
+.ai-q-label { font-size: 14px; font-weight: 700; color: #000; margin-bottom: 8px; }
+.ai-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.ai-chip { border: none; background: var(--surface, rgba(255,255,255,.5)); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); color: #000; border-radius: 999px; padding: 8px 14px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.ai-chip.active { background: #111; color: #fff; }
+
+/* chat — layout */
+.ai-chat-screen { display: flex; flex-direction: column; min-height: 0; }
+.ai-head { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+.ai-head-img { width: 38px; height: 38px; border-radius: 11px; object-fit: cover; }
+.ai-head-name { font-size: 15px; font-weight: 800; color: #000; line-height: 1.1; }
+.ai-head-status { font-size: 11.5px; color: rgba(0,0,0,.55); }
+.ai-msgs { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding: 12px 2px; }
+.ai-row { display: flex; align-items: flex-end; gap: 8px; max-width: 88%; }
+.ai-row.user { align-self: flex-end; }
+.ai-row.assistant { align-self: flex-start; }
+.ai-av { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; flex: 0 0 auto; background: rgba(255,255,255,.6); }
+.ai-bubble { padding: 10px 13px; border-radius: 16px; font-size: 14px; line-height: 1.5; white-space: pre-wrap; }
+.ai-bubble.assistant { background: rgba(255,255,255,.62); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); color: #111; border-bottom-left-radius: 5px; }
+.ai-bubble.user { background: #111; color: #fff; border-bottom-right-radius: 5px; }
+.ai-typing { display: inline-flex; gap: 4px; align-items: center; }
+.ai-typing span { width: 7px; height: 7px; border-radius: 50%; background: rgba(0,0,0,.35); animation: aitype 1s infinite ease-in-out; }
+.ai-typing span:nth-child(2) { animation-delay: .15s; }
+.ai-typing span:nth-child(3) { animation-delay: .3s; }
+@keyframes aitype { 0%, 60%, 100% { opacity: .3; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-3px); } }
+.ai-input { display: flex; align-items: flex-end; gap: 8px; padding: 8px 2px calc(env(safe-area-inset-bottom, 0px) + 8px); }
+.ai-input textarea { flex: 1; resize: none; max-height: 120px; border: none; border-radius: 18px; padding: 11px 14px; font-size: 14px; font-family: inherit; line-height: 1.4; background: rgba(255,255,255,.7); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); color: #111; }
+.ai-send { flex: 0 0 auto; width: 42px; height: 42px; border-radius: 50%; border: none; background: #111; color: #fff; font-size: 16px; cursor: pointer; }
+.ai-send:disabled { opacity: .4; }
+
+/* botão discreto no topo (ex.: Modelo do relatório na aba Relatórios) */
+.round-btn.subtle { background: transparent; color: rgba(0,0,0,.42); }
+.round-btn.subtle:active { background: rgba(0,0,0,.06); }

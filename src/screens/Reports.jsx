@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
-import { Back, FileText, Chevron, Pencil } from "../icons.jsx"
+import { Back, FileText, Chevron, Pencil, Gear } from "../icons.jsx"
 import { subscribeReports, deleteReport, renameReport, subscribeSharedReports } from "../lib/reports.js"
 
 // Converte o createdAt (Timestamp do Firestore, Date ou {seconds}) em Date
@@ -199,7 +199,7 @@ export default function Reports({ go }) {
       <div className="topbar" data-tour="rpt-top">
         <button className="round-btn" onClick={() => go("home")} aria-label="Voltar"><Back size={20} /></button>
         <div className="title center">Relatórios</div>
-        <span style={{ width: 44 }} />
+        <button className="round-btn subtle" onClick={() => go("reportmodel")} aria-label="Modelo do relatório"><Gear size={18} /></button>
       </div>
 
       {loading ? (

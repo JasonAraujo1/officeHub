@@ -1,5 +1,6 @@
 const { onObjectFinalized } = require("firebase-functions/v2/storage")
 const { onDocumentCreated } = require("firebase-functions/v2/firestore")
+const { onCall, HttpsError } = require("firebase-functions/v2/https")
 const { defineSecret } = require("firebase-functions/params")
 const { initializeApp } = require("firebase-admin/app")
 const { getFirestore } = require("firebase-admin/firestore")
@@ -221,5 +222,77 @@ exports.sendPush = onDocumentCreated(
     } catch (e) {
       logger.error("Falha ao enviar push", e)
     }
+  }
+)
+
+// ===================================================================
+// IA do Controlaí — chat de gestão ágil (Groq), liberado após o questionário.
+// Base: "primer" embutido + respostas do questionário do usuário.
+// Para evoluir: acrescente seus materiais em AGILE_KNOWLEDGE abaixo.
+// ===================================================================
+const AGILE_KNOWLEDGE = `
+PRINCÍPIOS (Manifesto Ágil): indivíduos e interações acima de processos; software/entregas funcionando acima de documentação excessiva; colaboração acima de contratos; responder a mudanças acima de seguir um plano fixo.
+SCRUM: papéis (Product Owner, Scrum Master, Time); eventos (Sprint 1–4 semanas, Planning, Daily 15min, Review, Retrospective); artefatos (Product Backlog, Sprint Backlog, Incremento); Definition of Done.
+KANBAN: quadro A fazer/Fazendo/Feito; limitar WIP (trabalho em progresso); puxar tarefas; métricas de lead time e throughput; melhoria contínua.
+REUNIÕES EFICAZES: ter objetivo claro, pauta, time-box, participantes certos, decisões e responsáveis registrados ao final. Formatos comuns: daily standup, planejamento, revisão/demonstração, retrospectiva, 1:1, alinhamento semanal, kickoff.
+PAUTAS: abertura/objetivo; pontos a tratar com tempo; decisões; próximos passos com responsável e prazo.
+RETROSPECTIVA: o que foi bem, o que pode melhorar, ações. Formatos: "Start/Stop/Continue", "Mad/Sad/Glad".
+RELATÓRIOS/ATAS: contexto, participantes, decisões, pendências (o que falta), responsáveis e prazos.
+ADAPTAÇÃO POR TAMANHO: equipes pequenas (1–15) podem usar Kanban leve + 1 reunião semanal; equipes maiores se beneficiam de Scrum com cadência definida.
+`
+
+exports.chatAgile = onCall(
+  { region: "us-east1", secrets: [GROQ_API_KEY], timeoutSeconds: 60, memory: "256MiB" },
+  async (request) => {
+    if (!request.auth) throw new HttpsError("unauthenticated", "Faça login.")
+    const groqKey = GROQ_API_KEY.value()
+    const inMsgs = Array.isArray(request.data?.messages) ? request.data.messages : []
+    const survey = request.data?.survey || {}
+
+    // contexto do questionário
+    const surveyText = Object.entries(survey)
+      .filter(([, v]) => v)
+      .map(([k, v]) => `- ${k}: ${v}`)
+      .join("\n") || "(sem respostas)"
+
+    // histórico recente (limita para caber no contexto)
+    const history = inMsgs
+      .filter((m) => m && (m.role === "user" || m.role === "assistant") && typeof m.content === "string")
+      .slice(-16)
+      .map((m) => ({ role: m.role, content: m.content.slice(0, 4000) }))
+
+    const system = {
+      role: "system",
+      content:
+        "Você é a IA do Controlaí, uma assistente especialista em GESTÃO ÁGIL para equipes e empresas. " +
+        "Responda SEMPRE em português do Brasil, de forma prática e objetiva. Quando útil, entregue modelos prontos " +
+        "(pautas de reunião, formatos de reunião, atividades, roteiros de palestra, modelos de relatório/ata) que o usuário possa copiar e adaptar. " +
+        "Sugira melhorias com base no padrão atual da equipe. Use o conhecimento abaixo e o perfil do usuário. " +
+        "Se a pergunta fugir muito de gestão/produtividade/equipes, traga de volta ao tema com gentileza.\n\n" +
+        "CONHECIMENTO DE BASE:\n" + AGILE_KNOWLEDGE + "\n" +
+        "PERFIL DA EQUIPE (do questionário):\n" + surveyText,
+    }
+
+    const callGroq = () =>
+      fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: { authorization: "Bearer " + groqKey, "content-type": "application/json" },
+        body: JSON.stringify({
+          model: "llama-3.3-70b-versatile",
+          temperature: 0.6,
+          messages: [system, ...history],
+        }),
+      })
+
+    let gq = await callGroq()
+    if (!gq.ok) {
+      logger.warn("chatAgile 1ª tentativa falhou:", gq.status)
+      await sleep(4000)
+      gq = await callGroq()
+      if (!gq.ok) throw new HttpsError("internal", "Falha ao consultar a IA.")
+    }
+    const json = await gq.json()
+    const reply = json?.choices?.[0]?.message?.content || ""
+    return { reply }
   }
 )

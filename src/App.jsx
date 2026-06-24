@@ -15,6 +15,7 @@ import Notes from "./screens/Notes.jsx"
 import Team from "./screens/Team.jsx"
 import Dashboard from "./screens/Dashboard.jsx"
 import ReportModel from "./screens/ReportModel.jsx"
+import AIChat from "./screens/AIChat.jsx"
 import Login from "./screens/Login.jsx"
 import BottomNav from "./components/BottomNav.jsx"
 import PushToasts from "./components/PushToasts.jsx"
@@ -34,7 +35,7 @@ const TOUR_STEPS = [
   { screen: "reports", selector: '[data-tour="rpt-top"]', title: "Relatórios", body: "Todos os seus relatórios ficam aqui, junto com os que marcaram você. Tudo pronto!" },
 ]
 
-const SCREENS = { home: Home, reports: Reports, report: Report, calendar: Calendar, widgets: Widgets, record: Record, attach: Attach, profile: Profile, settings: Settings, support: Support, notifications: Notifications, notes: Notes, team: Team, dashboard: Dashboard, reportmodel: ReportModel }
+const SCREENS = { home: Home, reports: Reports, report: Report, calendar: Calendar, widgets: Widgets, record: Record, attach: Attach, profile: Profile, settings: Settings, support: Support, notifications: Notifications, notes: Notes, team: Team, dashboard: Dashboard, reportmodel: ReportModel, ai: AIChat }
 const NAV_TABS = ["home", "reports", "calendar", "widgets"]
 
 // Cor do topo (barra de status) por tela — para a barra "continuar" a tela.
@@ -54,6 +55,7 @@ const SCREEN_THEME = {
   team: "#cfe2fe",
   dashboard: "#cfe2fe",
   reportmodel: "#cfe2fe",
+  ai: "#cfe2fe",
 }
 function setThemeColor(color) {
   const m = document.querySelector('meta[name="theme-color"]')

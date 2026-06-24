@@ -2,6 +2,7 @@ import { initializeApp } from "firebase/app"
 import { getAuth } from "firebase/auth"
 import { initializeFirestore } from "firebase/firestore"
 import { getStorage } from "firebase/storage"
+import { getFunctions } from "firebase/functions"
 
 const config = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -15,7 +16,7 @@ const config = {
 // Só inicializa se estiver configurado (evita quebrar o app sem .env)
 export const isConfigured = Boolean(config.apiKey && config.projectId)
 
-let app, auth, db, storage
+let app, auth, db, storage, functions
 if (isConfigured) {
   app = initializeApp(config)
   auth = getAuth(app)
@@ -25,7 +26,8 @@ if (isConfigured) {
     useFetchStreams: false,
   })
   storage = getStorage(app)
+  functions = getFunctions(app, "us-east1")
 }
 
 export const projectId = config.projectId
-export { app, auth, db, storage }
+export { app, auth, db, storage, functions }

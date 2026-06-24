@@ -51,7 +51,7 @@ export default function ReportModel({ go }) {
   return (
     <div className="screen fn-sub-screen reportmodel-screen">
       <div className="topbar">
-        <button className="round-btn" onClick={() => go("settings")} aria-label="Voltar"><Back size={20} /></button>
+        <button className="round-btn" onClick={() => go("reports")} aria-label="Voltar"><Back size={20} /></button>
         <div className="title center">Modelo do relatório</div>
         <span style={{ width: 44 }} />
       </div>

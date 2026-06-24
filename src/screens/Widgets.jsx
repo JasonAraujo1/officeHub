@@ -8,6 +8,7 @@ import { subscribeReports } from "../lib/reports.js"
 import { subscribeEvents } from "../lib/events.js"
 import { subscribeNotes } from "../lib/notes.js"
 import { subscribeConnections } from "../lib/team.js"
+import iaImg from "../assets/prancheta.png"
 
 export default function Widgets({ go }) {
   const { user, logout } = useAuth()
@@ -34,6 +35,8 @@ export default function Widgets({ go }) {
     { key: "cal", label: "Calendário", unit: "Eventos", color: "calendar", Icon: Calendar, onClick: () => go("calendar") },
     { key: "notes", label: "Notas", unit: "Notas", color: "tools", Icon: Doc, onClick: () => go("notes") },
     { key: "team", label: "Minha equipe", unit: "Conexões", color: "account", Icon: Users, onClick: () => go("team") },
+    { key: "ia", label: "IA Controlaí", sub: "Gestão ágil", color: "home", img: iaImg, Icon: Chart, onClick: () => go("ai") },
+    { key: "dash", label: "Dashboard", sub: "Semana, mês e ano", color: "tools", Icon: Chart, onClick: () => go("dashboard") },
   ]
 
   return (
@@ -63,13 +66,6 @@ export default function Widgets({ go }) {
         <span className="config-sub">Conta, papel e preferências</span>
       </button>
 
-      {/* widget de relatório & dashboard */}
-      <button className="config-widget" onClick={() => go("dashboard")}>
-        <span className="config-ic" style={{ background: "var(--c-blue)" }}><Chart size={20} /></span>
-        <span className="config-label">Relatório &amp; Dashboard</span>
-        <span className="config-sub">Atividades e tarefas — semana, mês e ano</span>
-      </button>
-
       {/* widget de suporte */}
       <button className="config-widget" onClick={() => go("support")}>
         <span className="config-ic" style={{ background: "var(--c-purple)" }}><Help size={20} /></span>
@@ -79,16 +75,18 @@ export default function Widgets({ go }) {
 
       <div className="settings-section">Atalhos</div>
       <div className="stat-grid" data-tour="fn-shortcuts">
-        {shortcuts.map(({ key, label, sub, unit, color, Icon, onClick }) => {
+        {shortcuts.map(({ key, label, sub, unit, color, Icon, img, onClick }) => {
           const c = FN_COLORS[color]
           const txt = textOn(c.light)
           const n = counts[key]
           return (
             <button key={key} className="stat-card sc-widget" onClick={onClick}
               style={{ background: c.light, color: txt, position: "relative", overflow: "hidden" }}>
-              {/* doodle: ícone grande e esmaecido ao fundo */}
-              <Icon size={118} style={{ position: "absolute", right: -16, bottom: -18, color: c.dark, opacity: 0.16, pointerEvents: "none" }} />
-              <div className="stat-head" style={{ color: txt }}><span className="stat-ic" style={{ color: txt }}><Icon size={16} /></span>{label}</div>
+              {/* doodle: ícone/imagem grande e esmaecido ao fundo */}
+              {img
+                ? <img src={img} alt="" style={{ position: "absolute", width: 96, right: -14, bottom: -14, opacity: 0.18, pointerEvents: "none" }} />
+                : <Icon size={118} style={{ position: "absolute", right: -16, bottom: -18, color: c.dark, opacity: 0.16, pointerEvents: "none" }} />}
+              <div className="stat-head" style={{ color: txt }}><span className="stat-ic" style={{ color: txt }}>{img ? <img src={img} alt="" style={{ width: 18, height: 18, borderRadius: 4, objectFit: "cover" }} /> : <Icon size={16} />}</span>{label}</div>
               <div className="stat-val" style={{ position: "relative" }}>
                 {unit ? (
                   <>
