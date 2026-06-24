@@ -23,6 +23,14 @@ export async function createReport(blob, { title, durationSec = 0, ext = "webm" 
   await uploadBytes(ref(storage, path), blob, { contentType })
   const audioUrl = await getDownloadURL(ref(storage, path))
 
+  // modelo de formatação salvo pelo usuário (prompt/documento de referência),
+  // gravado no relatório para a Cloud Function aplicar ao gerar a análise.
+  let formatPrompt = ""
+  try {
+    const prof = await getDoc(doc(db, "users", u))
+    formatPrompt = (prof.exists() && prof.data().reportPrompt) || ""
+  } catch (e) { /* sem modelo: segue padrão */ }
+
   // 2) cria o documento — SEM travar esperando o ack do servidor.
   //    A escrita vai pro cache local na hora e sincroniza em background.
   setDoc(doc(db, "users", u, "reports", id), {
@@ -33,6 +41,7 @@ export async function createReport(blob, { title, durationSec = 0, ext = "webm" 
     stage: "Enviando áudio",
     durationSec,
     audioUrl,
+    formatPrompt,
     createdAt: serverTimestamp(),
   }).catch((e) => console.error("Falha ao criar o doc do relatório:", e))
 

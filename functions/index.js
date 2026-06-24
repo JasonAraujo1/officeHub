@@ -79,6 +79,13 @@ exports.processAudio = onObjectFinalized(
       if (!t || t.status !== "completed") throw new Error("Transcrição não concluiu a tempo")
       await setProgress(80, "Gerando relatório")
 
+      // modelo de formatação definido pelo usuário (prompt/documento de referência)
+      let formatPrompt = ""
+      try {
+        const snap = await docRef.get()
+        if (snap.exists) formatPrompt = (snap.data().formatPrompt || "").toString().slice(0, 4000)
+      } catch (e) { logger.warn("Sem formatPrompt:", e) }
+
       const utterances = (t.utterances || []).map((u) => ({
         speaker: "Interlocutor " + (u.speaker || "?"),
         text: u.text || "",
@@ -110,7 +117,10 @@ exports.processAudio = onObjectFinalized(
             "done = array com o que já foi feito, realizado ou decidido; " +
             "toDo = array com o que se quer que seja feito (próximos passos e pendências), incluindo responsável quando mencionado; " +
             "speakers = número de interlocutores. " +
-            "Seja detalhado e fiel à conversa. Se algo não aparecer, devolva array vazio. Responda APENAS com JSON válido.",
+            "Seja detalhado e fiel à conversa. Se algo não aparecer, devolva array vazio. Responda APENAS com JSON válido." +
+            (formatPrompt
+              ? " INSTRUÇÕES DE FORMATAÇÃO DO USUÁRIO (siga-as ao escrever o conteúdo dos campos, especialmente 'analysis': tom, estrutura, ênfases e o que destacar — mas NÃO altere os nomes dos campos do JSON nem deixe de retornar JSON válido): " + formatPrompt
+              : ""),
         },
         { role: "user", content: "Transcrição:\n" + transcriptText },
       ]

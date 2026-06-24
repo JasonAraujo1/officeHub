@@ -54,7 +54,7 @@ export default function Home({ go }) {
             </div>
           </div>
           <div style={{ display: "flex", gap: 8 }}>
-            <NotifBell go={go} />
+            <span data-tour="home-bell" style={{ display: "inline-flex" }}><NotifBell go={go} /></span>
             <button className="round-btn" onClick={() => setMenu(true)} aria-label="Menu"><Menu size={20} /></button>
           </div>
         </div>
@@ -79,7 +79,7 @@ export default function Home({ go }) {
       <div className="home-body">
 
         {/* stat cards */}
-        <div className="stat-grid">
+        <div className="stat-grid" data-tour="home-stats">
           <button className="stat-card coral" onClick={() => go("reports")}>
             <div className="stat-head"><span className="stat-ic"><FileSolid size={16} /></span>Relatórios</div>
             <MiniBars seed={1} color="#e3824a" />
@@ -99,7 +99,7 @@ export default function Home({ go }) {
         </div>
 
         {/* card verde: gravar / anexar */}
-        <div className="hero-card">
+        <div className="hero-card" data-tour="home-hero">
           <div className="hero-label"><MicSolid size={14} /> Gravação</div>
           <div className="hero-title">Iniciar gravação / Transcrição</div>
           <div className="hero-actions">

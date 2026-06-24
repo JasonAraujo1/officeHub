@@ -1081,7 +1081,7 @@ html, body { background: #000; }
 
 /* Superfícies translúcidas (fosco) — substituem o branco sólido nessas telas.
    Sobrescreve os tokens, então TODO elemento (.list-card, .card, .meta, etc.) herda. */
-.notif-screen, .profile-screen, .support-screen, .notes-screen, .team-screen {
+.notif-screen, .profile-screen, .support-screen, .notes-screen, .team-screen, .dash-screen, .reportmodel-screen {
   --surface: rgba(255,255,255,.42);
   --surface-2: rgba(255,255,255,.30);
   --card: rgba(255,255,255,.42);
@@ -1105,7 +1105,8 @@ html, body { background: #000; }
   -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
   border: 1px solid rgba(255,255,255,.5);
 }
-.support-screen .profile-avatar {
+.support-screen .profile-avatar,
+.reportmodel-screen .profile-avatar {
   background: rgba(255,255,255,.42); color: #000;
   -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
   border: 1px solid rgba(255,255,255,.5);
@@ -1253,3 +1254,58 @@ button:active, .recent-card:active, .row-item:active, .stat-card:active,
 .kb-card-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; }
 .kb-assignee { font-size: 11px; font-weight: 800; color: #000; background: rgba(0,0,0,.08); border-radius: 999px; padding: 3px 9px; }
 .kb-date { font-size: 11px; color: #666; }
+
+/* ===================================================================
+   TOUR de boas-vindas (onboarding 1º login)
+=================================================================== */
+.tour-root { position: fixed; inset: 0; z-index: 4000; }
+.tour-block { position: absolute; inset: 0; }
+.tour-dim { position: absolute; inset: 0; background: rgba(0,0,0,.62); }
+.tour-hole {
+  position: fixed; border-radius: 16px; pointer-events: none;
+  box-shadow: 0 0 0 9999px rgba(0,0,0,.62);
+  transition: top .25s ease, left .25s ease, width .25s ease, height .25s ease;
+}
+.tour-pop {
+  position: fixed; z-index: 4001; background: #fff; color: #111;
+  border-radius: 18px; padding: 16px 16px 14px;
+  box-shadow: 0 16px 44px rgba(0,0,0,.32);
+  animation: tourpop .22s ease;
+}
+@keyframes tourpop { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.tour-step { font-size: 12px; font-weight: 700; color: rgba(0,0,0,.4); }
+.tour-title { font-size: 17px; font-weight: 800; margin: 3px 0 6px; }
+.tour-body { font-size: 14px; line-height: 1.45; color: rgba(0,0,0,.78); }
+.tour-actions { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; }
+.tour-skip { border: none; background: none; color: rgba(0,0,0,.5); font-size: 14px; font-weight: 600; cursor: pointer; padding: 6px 4px; }
+.tour-btn { border: none; background: #111; color: #fff; border-radius: 12px; padding: 9px 18px; font-size: 14px; font-weight: 700; cursor: pointer; }
+.tour-btn.ghost { background: rgba(0,0,0,.07); color: #111; }
+
+/* ===================================================================
+   DASHBOARD (Relatório semana/mês/ano)
+=================================================================== */
+.dash-summary { font-size: 13.5px; color: rgba(0,0,0,.7); margin: 2px 2px 14px; line-height: 1.5; }
+.dash-summary strong { color: #000; }
+.dash-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 4px; }
+.dash-tile {
+  background: var(--surface); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 6px;
+}
+.dash-tile-ic { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; color: #fff; }
+.dash-tile-n { font-size: 30px; font-weight: 800; color: #000; line-height: 1; margin-top: 2px; }
+.dash-tile-l { font-size: 12.5px; font-weight: 600; color: rgba(0,0,0,.6); }
+.dash-card {
+  background: var(--surface); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  border-radius: 18px; padding: 16px; margin-bottom: 12px;
+}
+.dash-stack { display: flex; height: 16px; border-radius: 999px; overflow: hidden; background: rgba(0,0,0,.08); }
+.dash-stack span { display: block; height: 100%; transition: width .3s ease; }
+.dash-legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 14px; }
+.dash-leg { display: flex; align-items: center; gap: 6px; font-size: 13px; color: rgba(0,0,0,.7); }
+.dash-leg i { width: 10px; height: 10px; border-radius: 3px; flex: 0 0 auto; }
+.dash-leg strong { color: #000; font-weight: 800; }
+.dash-bars { display: flex; align-items: flex-end; gap: 6px; height: 150px; }
+.dash-bar { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 4px; min-width: 0; }
+.dash-bar-n { font-size: 11px; font-weight: 800; color: rgba(0,0,0,.65); }
+.dash-bar-fill { width: 100%; max-width: 26px; min-height: 3px; border-radius: 6px 6px 3px 3px; transition: height .3s ease; }
+.dash-bar-l { font-size: 10.5px; font-weight: 600; color: rgba(0,0,0,.55); white-space: nowrap; }

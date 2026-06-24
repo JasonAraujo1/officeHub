@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Back, Shield, LogOut, Users, Bell } from "../icons.jsx"
+import { Back, Shield, LogOut, Users, Bell, FileText } from "../icons.jsx"
 import { useAuth } from "../auth.jsx"
 import { isSuperadmin } from "../lib/roles.js"
 import { enablePush, pushStatus } from "../lib/push.js"
@@ -69,6 +69,14 @@ export default function Settings({ go }) {
         </button>
       </div>
 
+      <div className="settings-section">Relatórios</div>
+      <div className="list-card">
+        <button className="row-item" onClick={() => go("reportmodel")}>
+          <span className="row-ic"><FileText size={18} /></span>
+          <span className="row-label">Modelo do relatório<br /><span className="row-label sub">Defina como formatar a análise do áudio</span></span>
+        </button>
+      </div>
+
       {admin && (
         <>
           <div className="settings-section">Administração</div>
@@ -83,6 +91,10 @@ export default function Settings({ go }) {
 
       <div className="settings-section">Aplicativo</div>
       <div className="list-card">
+        <button className="row-item" onClick={() => { go("home"); window.dispatchEvent(new Event("controlai:tour")) }}>
+          <span className="row-ic"><Bell size={18} /></span>
+          <span className="row-label">Rever tour de boas-vindas</span>
+        </button>
         <div className="row-item static">
           <span className="row-label">Versão</span>
           <span className="row-value">0.0.1</span>

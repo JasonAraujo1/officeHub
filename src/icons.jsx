@@ -96,6 +96,9 @@ export const Calendar = (p) => (
 export const Activity = (p) => (
   <S {...p}><path d="M3 12h4l2.5-7 5 14L17 12h4"/></S>
 )
+export const Chart = (p) => (
+  <S {...p}><path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6" rx="1"/><rect x="12" y="7" width="3" height="10" rx="1"/><rect x="17" y="13" width="3" height="4" rx="1"/></S>
+)
 export const Menu = (p) => (
   <S {...p}><path d="M3 6h18"/><path d="M3 12h18"/><path d="M3 18h18"/></S>
 )

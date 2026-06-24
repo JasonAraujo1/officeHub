@@ -30,6 +30,18 @@ export async function setController(value) {
   await setDoc(doc(db, "users", u.uid), { isController: !!value }, { merge: true })
 }
 
+// Marca/desmarca se o usuário já viu o tour de boas-vindas.
+export async function setTourSeen(value = true) {
+  const u = me()
+  await setDoc(doc(db, "users", u.uid), { tourVisto: !!value }, { merge: true })
+}
+
+// Salva o modelo/instruções de formatação do relatório (prompt de referência).
+export async function setReportPrompt(text = "") {
+  const u = me()
+  await setDoc(doc(db, "users", u.uid), { reportPrompt: text || "" }, { merge: true })
+}
+
 // Procura o usuário pelo e-mail e cria uma solicitação (entregue dentro do app).
 export async function inviteByEmail(email, role = "") {
   const u = me()

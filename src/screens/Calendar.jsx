@@ -174,7 +174,7 @@ export default function Calendar({ go }) {
       </div>
 
       {/* grade do calendário */}
-      <div className="cal-card" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+      <div className="cal-card" data-tour="cal-grid" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
         <div className="cal-weekdays">{WEEKDAYS.map((w) => <span key={w}>{w}</span>)}</div>
         <div className="cal-grid cal-anim" key={`${view.year}-${view.month}`}>
           {cells.map((day, i) => {

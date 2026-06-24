@@ -196,7 +196,7 @@ export default function Reports({ go }) {
 
   return (
     <div className="screen has-nav reports-screen">
-      <div className="topbar">
+      <div className="topbar" data-tour="rpt-top">
         <button className="round-btn" onClick={() => go("home")} aria-label="Voltar"><Back size={20} /></button>
         <div className="title center">Relatórios</div>
         <span style={{ width: 44 }} />

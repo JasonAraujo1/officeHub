@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Mic, Plus, FileText, Calendar, Menu, User, Gear, Shield, Help, Doc, Users } from "../icons.jsx"
+import { Mic, Plus, FileText, Calendar, Menu, User, Gear, Shield, Help, Doc, Users, Chart } from "../icons.jsx"
 import SideMenu from "../components/SideMenu.jsx"
 import { useAuth } from "../auth.jsx"
 import { isSuperadmin, roleLabel } from "../lib/roles.js"
@@ -57,10 +57,17 @@ export default function Widgets({ go }) {
       </button>
 
       {/* widget de configurações */}
-      <button className="config-widget" onClick={() => go("settings")}>
+      <button className="config-widget" data-tour="fn-config" onClick={() => go("settings")}>
         <span className="config-ic"><Gear size={20} /></span>
         <span className="config-label">Configurações</span>
         <span className="config-sub">Conta, papel e preferências</span>
+      </button>
+
+      {/* widget de relatório & dashboard */}
+      <button className="config-widget" onClick={() => go("dashboard")}>
+        <span className="config-ic" style={{ background: "var(--c-blue)" }}><Chart size={20} /></span>
+        <span className="config-label">Relatório &amp; Dashboard</span>
+        <span className="config-sub">Atividades e tarefas — semana, mês e ano</span>
       </button>
 
       {/* widget de suporte */}
@@ -71,7 +78,7 @@ export default function Widgets({ go }) {
       </button>
 
       <div className="settings-section">Atalhos</div>
-      <div className="stat-grid">
+      <div className="stat-grid" data-tour="fn-shortcuts">
         {shortcuts.map(({ key, label, sub, unit, color, Icon, onClick }) => {
           const c = FN_COLORS[color]
           const txt = textOn(c.light)
