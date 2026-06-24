@@ -1,8 +1,13 @@
-import { useState } from "react"
-import { Mic, Plus, FileText, Calendar, Menu, User, Gear, Shield, Help } from "../icons.jsx"
+import { useEffect, useState } from "react"
+import { Mic, Plus, FileText, Calendar, Menu, User, Gear, Shield, Help, Doc, Users } from "../icons.jsx"
 import SideMenu from "../components/SideMenu.jsx"
 import { useAuth } from "../auth.jsx"
 import { isSuperadmin, roleLabel } from "../lib/roles.js"
+import { FN_COLORS, textOn } from "../lib/colors.js"
+import { subscribeReports } from "../lib/reports.js"
+import { subscribeEvents } from "../lib/events.js"
+import { subscribeNotes } from "../lib/notes.js"
+import { subscribeConnections } from "../lib/team.js"
 
 export default function Widgets({ go }) {
   const { user, logout } = useAuth()
@@ -10,12 +15,25 @@ export default function Widgets({ go }) {
   const inicial = nome.charAt(0).toUpperCase()
   const admin = isSuperadmin(user)
   const [menu, setMenu] = useState(false)
+  const [counts, setCounts] = useState({ rep: null, cal: null, notes: null, team: null })
+
+  useEffect(() => {
+    const subs = []
+    const set = (k) => (list) => setCounts((c) => ({ ...c, [k]: list.length }))
+    try { subs.push(subscribeReports(set("rep"))) } catch (e) {}
+    try { subs.push(subscribeEvents(set("cal"))) } catch (e) {}
+    try { subs.push(subscribeNotes(set("notes"))) } catch (e) {}
+    try { subs.push(subscribeConnections(set("team"))) } catch (e) {}
+    return () => subs.forEach((u) => u && u())
+  }, [])
 
   const shortcuts = [
-    { key: "rec", label: "Nova gravação", sub: "Gravar e transcrever", cls: "mint", Icon: Mic, onClick: () => go("record") },
-    { key: "att", label: "Anexar áudio", sub: "Enviar um arquivo", cls: "coral", Icon: Plus, onClick: () => go("attach") },
-    { key: "rep", label: "Relatórios", sub: "Ver análises", cls: "sky", Icon: FileText, onClick: () => go("reports") },
-    { key: "cal", label: "Calendário", sub: "Eventos e prazos", cls: "lilac", Icon: Calendar, onClick: () => go("calendar") },
+    { key: "rec", label: "Gravação", sub: "Gravar e transcrever", color: "home", Icon: Mic, onClick: () => go("record") },
+    { key: "att", label: "Anexar", sub: "Enviar um arquivo", color: "record", Icon: Plus, onClick: () => go("attach") },
+    { key: "rep", label: "Relatórios", unit: "Relatórios", color: "reports", Icon: FileText, onClick: () => go("reports") },
+    { key: "cal", label: "Calendário", unit: "Eventos", color: "calendar", Icon: Calendar, onClick: () => go("calendar") },
+    { key: "notes", label: "Notas", unit: "Notas", color: "tools", Icon: Doc, onClick: () => go("notes") },
+    { key: "team", label: "Minha equipe", unit: "Conexões", color: "account", Icon: Users, onClick: () => go("team") },
   ]
 
   return (
@@ -54,15 +72,29 @@ export default function Widgets({ go }) {
 
       <div className="settings-section">Atalhos</div>
       <div className="stat-grid">
-        {shortcuts.map(({ key, label, sub, cls, Icon, onClick }) => (
-          <button key={key} className={`stat-card ${cls}`} onClick={onClick}>
-            <div className="stat-head"><span className="stat-ic"><Icon size={16} /></span></div>
-            <div>
-              <div className="stat-big" style={{ fontSize: 17 }}>{label}</div>
-              <div className="stat-sub">{sub}</div>
-            </div>
-          </button>
-        ))}
+        {shortcuts.map(({ key, label, sub, unit, color, Icon, onClick }) => {
+          const c = FN_COLORS[color]
+          const txt = textOn(c.light)
+          const n = counts[key]
+          return (
+            <button key={key} className="stat-card sc-widget" onClick={onClick}
+              style={{ background: c.light, color: txt, position: "relative", overflow: "hidden" }}>
+              {/* doodle: ícone grande e esmaecido ao fundo */}
+              <Icon size={118} style={{ position: "absolute", right: -16, bottom: -18, color: c.dark, opacity: 0.16, pointerEvents: "none" }} />
+              <div className="stat-head" style={{ color: txt }}><span className="stat-ic" style={{ color: txt }}><Icon size={16} /></span>{label}</div>
+              <div className="stat-val" style={{ position: "relative" }}>
+                {unit ? (
+                  <>
+                    <span className="stat-big" style={{ color: txt }}>{n == null ? "—" : n}</span>
+                    <span className="stat-sub" style={{ color: txt, opacity: 0.75 }}>{unit}</span>
+                  </>
+                ) : (
+                  <span className="stat-sub" style={{ color: txt, opacity: 0.85 }}>{sub}</span>
+                )}
+              </div>
+            </button>
+          )
+        })}
       </div>
     </div>
   )

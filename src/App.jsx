@@ -11,13 +11,15 @@ import Profile from "./screens/Profile.jsx"
 import Settings from "./screens/Settings.jsx"
 import Support from "./screens/Support.jsx"
 import Notifications from "./screens/Notifications.jsx"
+import Notes from "./screens/Notes.jsx"
+import Team from "./screens/Team.jsx"
 import Login from "./screens/Login.jsx"
 import BottomNav from "./components/BottomNav.jsx"
 import PushToasts from "./components/PushToasts.jsx"
 import { AuthProvider, useAuth } from "./auth.jsx"
 import { isConfigured } from "./firebase.js"
 
-const SCREENS = { home: Home, reports: Reports, report: Report, calendar: Calendar, widgets: Widgets, record: Record, attach: Attach, profile: Profile, settings: Settings, support: Support, notifications: Notifications }
+const SCREENS = { home: Home, reports: Reports, report: Report, calendar: Calendar, widgets: Widgets, record: Record, attach: Attach, profile: Profile, settings: Settings, support: Support, notifications: Notifications, notes: Notes, team: Team }
 const NAV_TABS = ["home", "reports", "calendar", "widgets"]
 
 // Cor do topo (barra de status) por tela — para a barra "continuar" a tela.
@@ -32,7 +34,9 @@ const SCREEN_THEME = {
   notifications: "#ffe7a3",
   profile: "#b7ffa9",
   settings: "#111111",
-  support: "#cfe2fe",
+  support: "#d8c2f4",
+  notes: "#cfe2fe",
+  team: "#cfe2fe",
 }
 function setThemeColor(color) {
   const m = document.querySelector('meta[name="theme-color"]')

@@ -88,3 +88,16 @@ export function subscribeConnections(cb) {
   const u = me()
   return onSnapshot(collection(db, "users", u.uid, "connections"), (s) => cb(s.docs.map((d) => d.data())))
 }
+
+// Controller edita a função de uma conexão (atualiza os dois lados).
+export async function updateConnectionRole(otherUid, role) {
+  const u = me()
+  const fn = (role || "").trim()
+  await setDoc(doc(db, "users", u.uid, "connections", otherUid), { role: fn }, { merge: true })
+  await setDoc(doc(db, "users", otherUid, "connections", u.uid), { role: fn }, { merge: true })
+  notify(otherUid, {
+    title: `${myName(u)} atualizou sua função`,
+    body: fn ? `Nova função: ${fn}.` : "Sua função foi removida.",
+    type: "info",
+  }).catch(() => {})
+}

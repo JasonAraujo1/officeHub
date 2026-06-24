@@ -1047,7 +1047,7 @@ html, body { background: #000; }
 
 /* ---- cores próprias de cada tela (sobrescrevem o azul padrão do fn-sub) ---- */
 .screen.profile-screen { background: #b7ffa9; }    /* Perfil: verde */
-.screen.support-screen { background: #cfe2fe; }     /* Suporte: azul */
+.screen.support-screen { background: #d8c2f4; }     /* Suporte: roxo */
 .screen.settings-screen { background: #111111; }    /* Configurações: preto */
 
 /* Configurações: letra e ícones brancos */
@@ -1081,7 +1081,7 @@ html, body { background: #000; }
 
 /* Superfícies translúcidas (fosco) — substituem o branco sólido nessas telas.
    Sobrescreve os tokens, então TODO elemento (.list-card, .card, .meta, etc.) herda. */
-.notif-screen, .profile-screen, .support-screen {
+.notif-screen, .profile-screen, .support-screen, .notes-screen, .team-screen {
   --surface: rgba(255,255,255,.42);
   --surface-2: rgba(255,255,255,.30);
   --card: rgba(255,255,255,.42);
@@ -1101,6 +1101,11 @@ html, body { background: #000; }
 
 /* Perfil: avatar (J) fosco translúcido, badge preto, "Sair" vermelho pastel */
 .profile-screen .profile-avatar {
+  background: rgba(255,255,255,.42); color: #000;
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,.5);
+}
+.support-screen .profile-avatar {
   background: rgba(255,255,255,.42); color: #000;
   -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
   border: 1px solid rgba(255,255,255,.5);

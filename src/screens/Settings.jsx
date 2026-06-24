@@ -1,32 +1,21 @@
 import { useEffect, useState } from "react"
-import { Back, Shield, LogOut, UserPlus, Users, Check, X, Bell } from "../icons.jsx"
+import { Back, Shield, LogOut, Users, Bell } from "../icons.jsx"
 import { useAuth } from "../auth.jsx"
 import { isSuperadmin } from "../lib/roles.js"
 import { enablePush, pushStatus } from "../lib/push.js"
-import {
-  subscribeProfile, setController, inviteByEmail,
-  subscribeIncoming, acceptInvite, declineInvite, subscribeConnections,
-} from "../lib/team.js"
+import { subscribeProfile, setController } from "../lib/team.js"
 
 export default function Settings({ go }) {
   const { user, logout } = useAuth()
   const admin = isSuperadmin(user)
   const [profile, setProfile] = useState(null)
-  const [incoming, setIncoming] = useState([])
-  const [connections, setConnections] = useState([])
-  const [email, setEmail] = useState("")
-  const [role, setRole] = useState("")
-  const [msg, setMsg] = useState(null)
-  const [busy, setBusy] = useState(false)
   const [pstat, setPstat] = useState("default")
 
   useEffect(() => {
     setPstat(pushStatus())
-    const subs = []
-    try { subs.push(subscribeProfile(setProfile)) } catch (e) { console.error(e) }
-    try { subs.push(subscribeIncoming(setIncoming)) } catch (e) { console.error(e) }
-    try { subs.push(subscribeConnections(setConnections)) } catch (e) { console.error(e) }
-    return () => subs.forEach((u) => u && u())
+    let unsub
+    try { unsub = subscribeProfile(setProfile) } catch (e) { console.error(e) }
+    return () => unsub && unsub()
   }, [])
 
   const isController = !!profile?.isController
@@ -38,16 +27,6 @@ export default function Settings({ go }) {
     if (pstat === "granted") { alert("Para desativar, use as configurações de notificação do navegador/dispositivo."); return }
     try { await enablePush(); setPstat("granted") }
     catch (e) { alert(e.message || "Não foi possível ativar as notificações.") }
-  }
-  async function invite() {
-    setMsg(null); setBusy(true)
-    try {
-      const t = await inviteByEmail(email, role)
-      setMsg({ ok: true, text: `Convite enviado para ${t.name}${role.trim() ? ` (${role.trim()})` : ""}.` })
-      setEmail(""); setRole("")
-    } catch (e) {
-      setMsg({ ok: false, text: e.message || "Erro ao enviar a solicitação." })
-    } finally { setBusy(false) }
   }
 
   return (
@@ -82,54 +61,12 @@ export default function Settings({ go }) {
         </button>
       </div>
 
-      {/* Equipe — só para controllers */}
-      {isController && (
-        <>
-          <div className="settings-section">Equipe</div>
-          <div className="list-card" style={{ padding: 16 }}>
-            <div className="row-label" style={{ marginBottom: 10 }}>Adicionar usuário e designar função</div>
-            <input className="rec-title-input" value={role} onChange={(e) => setRole(e.target.value)}
-              placeholder="Função (ex.: Editor, Analista)" style={{ marginBottom: 8, width: "100%" }} />
-            <div className="invite-row">
-              <input className="rec-title-input" value={email} onChange={(e) => setEmail(e.target.value)}
-                type="email" placeholder="email@exemplo.com" />
-              <button className="pill" style={{ borderRadius: 14 }} onClick={invite} disabled={busy}>
-                <UserPlus size={18} />
-              </button>
-            </div>
-            {msg && <p style={{ fontSize: 13, fontWeight: 600, color: msg.ok ? "var(--c-green)" : "#d23b3b" }}>{msg.text}</p>}
-          </div>
-        </>
-      )}
-
-      {/* Solicitações recebidas */}
-      {incoming.length > 0 && (
-        <>
-          <div className="settings-section">Solicitações recebidas</div>
-          <div className="list-card">
-            {incoming.map((inv) => (
-              <div className="row-item" key={inv.id}>
-                <span className="row-ic"><UserPlus size={18} /></span>
-                <span className="row-label">{inv.fromName} te convidou<br /><span className="row-label sub">{inv.role ? `Função: ${inv.role}` : inv.fromEmail}</span></span>
-                <button className="req-btn ok" onClick={() => acceptInvite(inv)} aria-label="Aceitar"><Check size={16} /></button>
-                <button className="req-btn no" onClick={() => declineInvite(inv)} aria-label="Recusar"><X size={16} /></button>
-              </div>
-            ))}
-          </div>
-        </>
-      )}
-
-      {/* Conexões */}
-      <div className="settings-section">Conexões {connections.length > 0 ? `(${connections.length})` : ""}</div>
+      <div className="settings-section">Equipe</div>
       <div className="list-card">
-        {connections.length === 0 ? (
-          <div className="row-item static"><span className="row-label sub">Nenhuma conexão ainda.</span></div>
-        ) : connections.map((c) => (
-          <div className="row-item static" key={c.uid}>
-            <span className="row-ic"><Users size={18} /></span>
-            <span className="row-label">{c.name}<br /><span className="row-label sub">{c.email}</span></span>
-          </div>
-        ))}
+        <button className="row-item" onClick={() => go("team")}>
+          <span className="row-ic"><Users size={18} /></span>
+          <span className="row-label">Minha equipe<br /><span className="row-label sub">{isController || admin ? "Adicione e edite membros" : "Veja sua equipe"}</span></span>
+        </button>
       </div>
 
       {admin && (

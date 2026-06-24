@@ -44,7 +44,7 @@ export default function Notifications({ go }) {
         else alert("Relatório não encontrado ou sem acesso.")
       } catch (e) { console.error(e) }
     } else if (n.type === "invite") {
-      go("settings")
+      go("team")
     }
   }
 
