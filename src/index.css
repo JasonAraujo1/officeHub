@@ -1361,7 +1361,16 @@ button:active, .recent-card:active, .row-item:active, .stat-card:active,
 .ai-input textarea { flex: 1; resize: none; max-height: 120px; border: none; border-radius: 18px; padding: 11px 14px; font-size: 14px; font-family: inherit; line-height: 1.4; background: rgba(255,255,255,.7); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); color: #111; }
 .ai-send { flex: 0 0 auto; width: 42px; height: 42px; border-radius: 50%; border: none; background: #111; color: #fff; font-size: 16px; cursor: pointer; }
 .ai-send:disabled { opacity: .4; }
+.ai-col { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.ai-event { background: rgba(255,255,255,.72); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border-radius: 14px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
+.ai-event-info { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: #111; line-height: 1.35; }
+.ai-event-info strong { font-size: 13.5px; }
+.ai-event-add { border: none; background: #111; color: #fff; border-radius: 999px; padding: 8px 14px; font-size: 12.5px; font-weight: 700; cursor: pointer; align-self: flex-start; }
+.ai-event-done { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; font-weight: 700; color: #2e9e5b; }
 
 /* botão discreto no topo (ex.: Modelo do relatório na aba Relatórios) */
 .round-btn.subtle { background: transparent; color: rgba(0,0,0,.42); }
 .round-btn.subtle:active { background: rgba(0,0,0,.06); }
+
+/* logo da marca na tela de login */
+.auth-logo { width: 60px; height: 60px; border-radius: 16px; object-fit: cover; display: block; margin-bottom: 10px; }

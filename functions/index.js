@@ -248,6 +248,7 @@ exports.chatAgile = onCall(
     const groqKey = GROQ_API_KEY.value()
     const inMsgs = Array.isArray(request.data?.messages) ? request.data.messages : []
     const survey = request.data?.survey || {}
+    const context = (request.data?.context || "").toString().slice(0, 12000)
 
     // contexto do questionário
     const surveyText = Object.entries(survey)
@@ -269,8 +270,16 @@ exports.chatAgile = onCall(
         "(pautas de reunião, formatos de reunião, atividades, roteiros de palestra, modelos de relatório/ata) que o usuário possa copiar e adaptar. " +
         "Sugira melhorias com base no padrão atual da equipe. Use o conhecimento abaixo e o perfil do usuário. " +
         "Se a pergunta fugir muito de gestão/produtividade/equipes, traga de volta ao tema com gentileza.\n\n" +
+        "Você TEM ACESSO aos dados do app do usuário (relatórios gerados, agenda/eventos, tarefas e notas) listados abaixo. " +
+        "Use-os para responder dúvidas sobre o que já foi feito, decisões, pendências e qualquer atividade do app. " +
+        "Se a informação não estiver nos dados, diga que não encontrou.\n\n" +
+        "MARCAR EVENTOS: quando o usuário pedir claramente para agendar/marcar/criar um evento, lembrete ou tarefa, " +
+        "responda normalmente e ACRESCENTE NO FINAL um bloco EXATAMENTE neste formato (uma única linha), sem inventar se o usuário não pediu:\n" +
+        "[[EVENTO]]{\"title\":\"...\",\"date\":\"AAAA-MM-DD\",\"time\":\"HH:MM\",\"type\":\"reuniao|tarefa|lembrete|vencimento|feriado\"}[[/EVENTO]]\n" +
+        "Use a DATA DE HOJE (no contexto) para resolver datas relativas (ex.: amanhã, sexta). Não crie o evento sozinho — o usuário confirmará.\n\n" +
         "CONHECIMENTO DE BASE:\n" + AGILE_KNOWLEDGE + "\n" +
-        "PERFIL DA EQUIPE (do questionário):\n" + surveyText,
+        "PERFIL DA EQUIPE (do questionário):\n" + surveyText + "\n\n" +
+        "DADOS DO APP DO USUÁRIO:\n" + (context || "(sem dados)"),
     }
 
     const callGroq = () =>

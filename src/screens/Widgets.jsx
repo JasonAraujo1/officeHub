@@ -8,7 +8,7 @@ import { subscribeReports } from "../lib/reports.js"
 import { subscribeEvents } from "../lib/events.js"
 import { subscribeNotes } from "../lib/notes.js"
 import { subscribeConnections } from "../lib/team.js"
-import iaImg from "../assets/prancheta.png"
+import iaImg from "../assets/logo.png"
 
 export default function Widgets({ go }) {
   const { user, logout } = useAuth()

@@ -1,11 +1,37 @@
 import { useEffect, useRef, useState } from "react"
-import { Back, Check } from "../icons.jsx"
-import { SURVEY, saveSurvey, callChat } from "../lib/ai.js"
+import { Back, Check, Calendar } from "../icons.jsx"
+import { SURVEY, saveSurvey, callChat, buildAppContext } from "../lib/ai.js"
 import { subscribeProfile } from "../lib/team.js"
+import { subscribeReports } from "../lib/reports.js"
+import { subscribeEvents, createEvent } from "../lib/events.js"
+import { subscribeTasks } from "../lib/tasks.js"
+import { subscribeNotes } from "../lib/notes.js"
+import { auth } from "../firebase.js"
 import gifTalk from "../assets/logo.gif"
-import imgIdle from "../assets/prancheta.png"
+import imgIdle from "../assets/logo.png"
 
-const GREETING = "Olá! Sou a IA do Controlaí, sua assistente de gestão ágil. Já conheço o perfil da sua equipe — posso sugerir formatos de reunião, pautas, atividades, palestras e modelos de relatório, ou tirar dúvidas. Por onde começamos?"
+const GREETING = "Olá! Sou a IA do Controlaí, sua assistente de gestão ágil. Já conheço o perfil da sua equipe e tenho acesso aos seus relatórios, agenda e atividades. Posso responder dúvidas sobre o que já foi feito, sugerir reuniões, pautas e relatórios — e até marcar eventos no seu calendário. Como posso ajudar?"
+
+const TIPOS = ["tarefa", "lembrete", "reuniao", "vencimento", "feriado"]
+
+// Extrai um bloco [[EVENTO]]{...}[[/EVENTO]] do texto, se houver.
+function parseEvent(text) {
+  const m = text.match(/\[\[EVENTO\]\]([\s\S]*?)\[\[\/EVENTO\]\]/)
+  if (!m) return { clean: text, event: null }
+  const clean = text.replace(m[0], "").trim()
+  try {
+    const o = JSON.parse(m[1].trim())
+    const d = new Date((o.date || "") + "T00:00:00")
+    if (isNaN(d)) return { clean, event: null }
+    const ev = {
+      title: (o.title || "Evento").toString().slice(0, 120),
+      type: TIPOS.includes(o.type) ? o.type : "reuniao",
+      day: d.getDate(), month: d.getMonth(), year: d.getFullYear(),
+      time: (o.time || "—").toString().slice(0, 10),
+    }
+    return { clean, event: ev }
+  } catch { return { clean, event: null } }
+}
 
 export default function AIChat({ go }) {
   const [profile, setProfile] = useState(null)
@@ -13,15 +39,24 @@ export default function AIChat({ go }) {
   const [answers, setAnswers] = useState({})
   const [saving, setSaving] = useState(false)
 
+  const [reports, setReports] = useState([])
+  const [events, setEvents] = useState([])
+  const [tasks, setTasks] = useState([])
+  const [notes, setNotes] = useState([])
+
   const [messages, setMessages] = useState([{ role: "assistant", content: GREETING }])
   const [input, setInput] = useState("")
   const [thinking, setThinking] = useState(false)
   const scrollRef = useRef(null)
 
   useEffect(() => {
-    let unsub
-    try { unsub = subscribeProfile((p) => { setProfile(p); setLoaded(true) }) } catch (e) { console.error(e) }
-    return () => unsub && unsub()
+    const subs = []
+    try { subs.push(subscribeProfile((p) => { setProfile(p); setLoaded(true) })) } catch (e) { console.error(e) }
+    try { subs.push(subscribeReports(setReports)) } catch (e) {}
+    try { subs.push(subscribeEvents(setEvents)) } catch (e) {}
+    try { subs.push(subscribeTasks(setTasks)) } catch (e) {}
+    try { subs.push(subscribeNotes(setNotes)) } catch (e) {}
+    return () => subs.forEach((u) => u && u())
   }, [])
 
   useEffect(() => {
@@ -44,12 +79,28 @@ export default function AIChat({ go }) {
     const next = [...messages, { role: "user", content: text }]
     setMessages(next); setInput(""); setThinking(true)
     try {
-      const reply = await callChat(next.filter((m) => m.role !== "system"), profile?.aiSurvey || {})
-      setMessages((m) => [...m, { role: "assistant", content: reply || "Desculpe, não consegui responder agora." }])
+      const ctx = buildAppContext({ reports, events, tasks, notes })
+      const reply = await callChat(next.filter((m) => m.role !== "system").map((m) => ({ role: m.role, content: m.content })), profile?.aiSurvey || {}, ctx)
+      const { clean, event } = parseEvent(reply || "")
+      setMessages((m) => [...m, { role: "assistant", content: clean || "Desculpe, não consegui responder agora.", event, eventAdded: false }])
     } catch (e) {
       console.error(e)
       setMessages((m) => [...m, { role: "assistant", content: "Tive um problema para responder. Tente novamente em instantes." }])
     } finally { setThinking(false) }
+  }
+
+  async function addEvent(idx) {
+    const ev = messages[idx]?.event
+    if (!ev) return
+    try {
+      const u = auth?.currentUser
+      await createEvent({
+        ...ev,
+        taggedUids: u ? [u.uid] : [],
+        taggedNames: u ? ["Eu mesmo"] : [],
+      })
+      setMessages((m) => m.map((msg, i) => i === idx ? { ...msg, eventAdded: true } : msg))
+    } catch (e) { console.error(e); alert("Não foi possível adicionar o evento.") }
   }
 
   // ----- LOADING -----
@@ -132,7 +183,20 @@ export default function AIChat({ go }) {
             {m.role === "assistant" && (
               <img src={(thinking && i === messages.length - 1) ? gifTalk : imgIdle} alt="" className="ai-av" />
             )}
-            <div className={`ai-bubble ${m.role}`}>{m.content}</div>
+            <div className="ai-col">
+              <div className={`ai-bubble ${m.role}`}>{m.content}</div>
+              {m.event && (
+                <div className="ai-event">
+                  <div className="ai-event-info">
+                    <Calendar size={16} />
+                    <span><strong>{m.event.title}</strong><br />{String(m.event.day).padStart(2, "0")}/{m.event.month + 1}/{m.event.year} · {m.event.time} · {m.event.type}</span>
+                  </div>
+                  {m.eventAdded
+                    ? <span className="ai-event-done"><Check size={14} /> Adicionado</span>
+                    : <button className="ai-event-add" onClick={() => addEvent(i)}>Adicionar ao calendário</button>}
+                </div>
+              )}
+            </div>
           </div>
         ))}
         {thinking && (
@@ -147,7 +211,7 @@ export default function AIChat({ go }) {
         <textarea
           value={input} onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send() } }}
-          placeholder="Pergunte sobre reuniões, pautas, relatórios…" rows={1}
+          placeholder="Pergunte sobre relatórios, agenda, atividades…" rows={1}
         />
         <button className="ai-send" onClick={send} disabled={thinking || !input.trim()} aria-label="Enviar">➤</button>
       </div>

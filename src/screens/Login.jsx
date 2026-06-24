@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useAuth } from "../auth.jsx"
 import { MicSolid, FileSolid, CalendarSolid, Sparkle, Play, Bolt } from "../icons.jsx"
+import logoUrl from "../assets/logo.png"
 
 function GoogleIcon() {
   return (
@@ -50,6 +51,7 @@ export default function Login() {
 
   return (
     <div className="screen auth login-screen">
+      <img src={logoUrl} alt="Controlaí" className="auth-logo" />
       <div className="auth-brand">Controlaí</div>
       <h1 className="auth-title">O que vamos organizar?</h1>
       <p className="auth-sub">{mode === "login" ? "Entre para continuar." : "Crie sua conta para começar."}</p>
