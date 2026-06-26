@@ -99,6 +99,9 @@ export const Activity = (p) => (
 export const Chart = (p) => (
   <S {...p}><path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6" rx="1"/><rect x="12" y="7" width="3" height="10" rx="1"/><rect x="17" y="13" width="3" height="4" rx="1"/></S>
 )
+export const Trash = (p) => (
+  <S {...p}><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></S>
+)
 export const Menu = (p) => (
   <S {...p}><path d="M3 6h18"/><path d="M3 12h18"/><path d="M3 18h18"/></S>
 )

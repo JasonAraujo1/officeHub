@@ -107,7 +107,7 @@ export default function Kanban() {
         const aiBg = col.dark
         const aiText = textOn(aiBg)
         return (
-          <div className="kb-col" key={col.key} style={{ background: col.light, color: headText }}>
+          <div className="kb-col" key={col.key} style={{ background: `color-mix(in srgb, ${col.light} 48%, transparent)`, color: headText }}>
             <button className="kb-col-head" onClick={() => setOpen((o) => ({ ...o, [col.key]: !o[col.key] }))}>
               <div className="kb-col-headl">
                 <span className="kb-col-title" style={{ color: headText }}>{col.label}</span>
@@ -124,7 +124,7 @@ export default function Kanban() {
             </button>
 
             {/* faixa de resumo de IA — cor do card, porém mais escura */}
-            <div className="kb-ai" style={{ background: aiBg, color: aiText }}>
+            <div className="kb-ai" style={{ background: `color-mix(in srgb, ${aiBg} 55%, transparent)`, color: aiText }}>
               <span className="kb-ai-label" style={{ color: aiText }}>Resumo IA</span>
               <p className="kb-ai-text" style={{ color: aiText }}>{aiSummary(items)}</p>
               {ppl.length > 0 && (

@@ -42,6 +42,12 @@ export async function setReportPrompt(text = "") {
   await setDoc(doc(db, "users", u.uid), { reportPrompt: text || "" }, { merge: true })
 }
 
+// Salva a configuração de widgets da Home (layout + slots escolhidos).
+export async function setHome(home) {
+  const u = me()
+  await setDoc(doc(db, "users", u.uid), { home: home || null }, { merge: true })
+}
+
 // Procura o usuário pelo e-mail e cria uma solicitação (entregue dentro do app).
 export async function inviteByEmail(email, role = "") {
   const u = me()

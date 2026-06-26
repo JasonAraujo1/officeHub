@@ -12,6 +12,7 @@ import Settings from "./screens/Settings.jsx"
 import Support from "./screens/Support.jsx"
 import Notifications from "./screens/Notifications.jsx"
 import Notes from "./screens/Notes.jsx"
+import NoteDetail from "./screens/NoteDetail.jsx"
 import Team from "./screens/Team.jsx"
 import Dashboard from "./screens/Dashboard.jsx"
 import ReportModel from "./screens/ReportModel.jsx"
@@ -20,6 +21,7 @@ import Login from "./screens/Login.jsx"
 import BottomNav from "./components/BottomNav.jsx"
 import PushToasts from "./components/PushToasts.jsx"
 import TourGuide from "./components/TourGuide.jsx"
+import AIFloating from "./components/AIFloating.jsx"
 import { AuthProvider, useAuth } from "./auth.jsx"
 import { isConfigured } from "./firebase.js"
 import { subscribeProfile, setTourSeen } from "./lib/team.js"
@@ -35,7 +37,7 @@ const TOUR_STEPS = [
   { screen: "reports", selector: '[data-tour="rpt-top"]', title: "Relatórios", body: "Todos os seus relatórios ficam aqui, junto com os que marcaram você. Tudo pronto!" },
 ]
 
-const SCREENS = { home: Home, reports: Reports, report: Report, calendar: Calendar, widgets: Widgets, record: Record, attach: Attach, profile: Profile, settings: Settings, support: Support, notifications: Notifications, notes: Notes, team: Team, dashboard: Dashboard, reportmodel: ReportModel, ai: AIChat }
+const SCREENS = { home: Home, reports: Reports, report: Report, calendar: Calendar, widgets: Widgets, record: Record, attach: Attach, profile: Profile, settings: Settings, support: Support, notifications: Notifications, notes: Notes, note: NoteDetail, team: Team, dashboard: Dashboard, reportmodel: ReportModel, ai: AIChat }
 const NAV_TABS = ["home", "reports", "calendar", "widgets"]
 
 // Cor do topo (barra de status) por tela — para a barra "continuar" a tela.
@@ -43,7 +45,7 @@ const SCREEN_THEME = {
   home: "#ffffff",
   reports: "#ffc7ab",
   report: "#ffc7ab",
-  calendar: "#ffffff",
+  calendar: "#d8c2f4",
   widgets: "#ffffff",
   record: "#b7ffa9",
   attach: "#b7ffa9",
@@ -52,6 +54,7 @@ const SCREEN_THEME = {
   settings: "#111111",
   support: "#d8c2f4",
   notes: "#cfe2fe",
+  note: "#cfe2fe",
   team: "#cfe2fe",
   dashboard: "#cfe2fe",
   reportmodel: "#cfe2fe",
@@ -143,6 +146,7 @@ function Shell() {
         </motion.div>
       </AnimatePresence>
       {showNav && <BottomNav active={screen} go={go} />}
+      <AIFloating go={go} hidden={screen === "ai"} />
       <PushToasts go={go} />
       {tourOn && <TourGuide key={tourKey} steps={TOUR_STEPS} go={go} currentScreen={screen} onFinish={finishTour} />}
     </div>

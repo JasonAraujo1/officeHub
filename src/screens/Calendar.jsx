@@ -25,14 +25,14 @@ const typeInfo = {
 }
 const ADD_TYPES = ["tarefa", "lembrete", "reuniao", "vencimento", "feriado"]
 
-export default function Calendar({ go }) {
+export default function Calendar({ go, item }) {
   const { user, logout } = useAuth()
   const nome = user?.displayName || user?.email?.split("@")[0] || "usuário"
   const [menu, setMenu] = useState(false)
   const [modal, setModal] = useState(null)        // visualização
   const [add, setAdd] = useState(null)            // formulário de adicionar
   const [view, setView] = useState({ year: CUR_YEAR, month: CUR_MONTH })
-  const [tab, setTab] = useState("cal")
+  const [tab, setTab] = useState(item?.tab === "act" ? "act" : "cal")
   const [ownEvts, setOwnEvts] = useState([])
   const [taggedEvts, setTaggedEvts] = useState([])
   const [connections, setConnections] = useState([])

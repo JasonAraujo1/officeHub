@@ -8,7 +8,7 @@ import { subscribeReports } from "../lib/reports.js"
 import { subscribeEvents } from "../lib/events.js"
 import { subscribeNotes } from "../lib/notes.js"
 import { subscribeConnections } from "../lib/team.js"
-import iaImg from "../assets/logo.png"
+import iaImg from "../assets/AI.png"
 
 export default function Widgets({ go }) {
   const { user, logout } = useAuth()
@@ -81,12 +81,12 @@ export default function Widgets({ go }) {
           const n = counts[key]
           return (
             <button key={key} className="stat-card sc-widget" onClick={onClick}
-              style={{ background: c.light, color: txt, position: "relative", overflow: "hidden" }}>
+              style={{ background: `color-mix(in srgb, ${c.light} 52%, transparent)`, color: txt, position: "relative", overflow: "hidden" }}>
               {/* doodle: ícone/imagem grande e esmaecido ao fundo */}
               {img
                 ? <img src={img} alt="" style={{ position: "absolute", width: 96, right: -14, bottom: -14, opacity: 0.18, pointerEvents: "none" }} />
                 : <Icon size={118} style={{ position: "absolute", right: -16, bottom: -18, color: c.dark, opacity: 0.16, pointerEvents: "none" }} />}
-              <div className="stat-head" style={{ color: txt }}><span className="stat-ic" style={{ color: txt }}>{img ? <img src={img} alt="" style={{ width: 18, height: 18, borderRadius: 4, objectFit: "cover" }} /> : <Icon size={16} />}</span>{label}</div>
+              <div className="stat-head" style={{ color: txt }}><span className="stat-ic" style={{ color: txt }}>{img ? <img src={img} alt="" style={{ width: 18, height: 18, objectFit: "contain" }} /> : <Icon size={16} />}</span>{label}</div>
               <div className="stat-val" style={{ position: "relative" }}>
                 {unit ? (
                   <>

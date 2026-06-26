@@ -8,7 +8,7 @@ import { subscribeTasks } from "../lib/tasks.js"
 import { subscribeNotes } from "../lib/notes.js"
 import { auth } from "../firebase.js"
 import gifTalk from "../assets/logo.gif"
-import imgIdle from "../assets/logo.png"
+import imgIdle from "../assets/AI.png"
 
 const GREETING = "Olá! Sou a IA do Controlaí, sua assistente de gestão ágil. Já conheço o perfil da sua equipe e tenho acesso aos seus relatórios, agenda e atividades. Posso responder dúvidas sobre o que já foi feito, sugerir reuniões, pautas e relatórios — e até marcar eventos no seu calendário. Como posso ajudar?"
 

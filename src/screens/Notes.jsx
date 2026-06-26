@@ -1,10 +1,19 @@
 import { useEffect, useState } from "react"
-import { Back, Plus, X } from "../icons.jsx"
-import { subscribeNotes, createNote, deleteNote } from "../lib/notes.js"
+import { Back, Plus, Check, Calendar } from "../icons.jsx"
+import { subscribeNotes, createNote } from "../lib/notes.js"
+
+function preview(n) {
+  if (n.kind === "checklist") {
+    const total = (n.items || []).length
+    const done = (n.items || []).filter((i) => i.done).length
+    return { hint: `checklist · ${done}/${total}`, body: (n.items || []).slice(0, 3).map((i) => i.text).join(" · ") }
+  }
+  return { hint: n.eventTitle ? "evento" : "nota", body: n.text || "" }
+}
 
 export default function Notes({ go }) {
   const [list, setList] = useState([])
-  const [text, setText] = useState("")
+  const [busy, setBusy] = useState(false)
 
   useEffect(() => {
     let unsub
@@ -12,11 +21,14 @@ export default function Notes({ go }) {
     return () => unsub && unsub()
   }, [])
 
-  async function add() {
-    const t = text.trim()
-    if (!t) return
-    try { await createNote(t); setText("") }
-    catch (e) { console.error(e); alert("Não foi possível salvar a nota.") }
+  async function addNew() {
+    if (busy) return
+    setBusy(true)
+    try {
+      const id = await createNote({ title: "", text: "", kind: "note", items: [] })
+      go("note", { id, title: "", text: "", kind: "note", items: [], eventId: "", eventTitle: "" })
+    } catch (e) { console.error(e); alert("Não foi possível criar a nota.") }
+    finally { setBusy(false) }
   }
 
   return (
@@ -24,28 +36,32 @@ export default function Notes({ go }) {
       <div className="topbar">
         <button className="round-btn" onClick={() => go("widgets")} aria-label="Voltar"><Back size={20} /></button>
         <div className="title center">Notas</div>
-        <span style={{ width: 44 }} />
+        <button className="round-btn subtle" onClick={addNew} aria-label="Nova nota"><Plus size={20} /></button>
       </div>
 
-      <div className="invite-row" style={{ marginBottom: 14 }}>
-        <input className="rec-title-input" value={text} placeholder="Escreva uma nota…"
-          onChange={(e) => setText(e.target.value)}
-          onKeyDown={(e) => { if (e.key === "Enter") add() }} />
-        <button className="pill" style={{ borderRadius: 14 }} onClick={add} aria-label="Adicionar nota"><Plus size={18} /></button>
-      </div>
+      <div className="note-grid">
+        <button className="note-card add" onClick={addNew}>
+          <Plus size={26} />
+          <span>Nova nota</span>
+        </button>
 
-      {list.length === 0 ? (
-        <p className="rec-status-msg" style={{ margin: "20px auto" }}>Nenhuma nota ainda.</p>
-      ) : (
-        <div className="recent-list">
-          {list.map((n) => (
-            <div className="list-card" key={n.id} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: 14 }}>
-              <span style={{ flex: 1, whiteSpace: "pre-wrap", fontSize: 14 }}>{n.text}</span>
-              <button className="notif-del" onClick={() => deleteNote(n.id)} aria-label="Excluir"><X size={15} /></button>
-            </div>
-          ))}
-        </div>
-      )}
+        {list.map((n) => {
+          const { hint, body } = preview(n)
+          return (
+            <button className="note-card" key={n.id} onClick={() => go("note", n)}>
+              <div className="note-card-top">
+                <span className="note-card-kind">
+                  {n.kind === "checklist" ? <Check size={13} /> : n.eventTitle ? <Calendar size={13} /> : null}
+                  {hint}
+                </span>
+              </div>
+              <div className="note-card-title">{n.title || (body ? "" : "Sem título")}</div>
+              <div className="note-card-body">{body}</div>
+              {n.eventTitle && <div className="note-card-evt"><Calendar size={12} /> {n.eventTitle}</div>}
+            </button>
+          )
+        })}
+      </div>
     </div>
   )
 }
